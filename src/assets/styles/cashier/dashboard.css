@@ -1,0 +1,98 @@
+.btn-export {
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  border: none;
+  color: white;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.btn-export svg {
+  font-size: 1.1rem;
+}
+
+.btn-export-excel {
+  background-color: #1f7244;
+}
+
+.btn-export-excel:hover {
+  background-color: #165733;
+  color: white;
+}
+
+.btn-export-pdf {
+  background-color: #dc3545;
+}
+
+.btn-export-pdf:hover {
+  background-color: #bb2d3b;
+  color: white;
+}
+
+.shadow-sm {
+  box-shadow: 0 .125rem .25rem rgba(0,0,0,.075)!important;
+}
+
+.bg-opacity-10 {
+  --bs-bg-opacity: 0.1;
+}
+
+.rounded-circle {
+  border-radius: 50%!important;
+}
+
+.card {
+  border: none;
+  border-radius: 0.5rem;
+  transition: transform 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+}
+
+.card-header {
+  border-bottom: 1px solid rgba(0,0,0,.125);
+  background-color: transparent;
+  padding: 1rem;
+}
+
+.card-header h5 {
+  color: var(--correjir-primary);
+  font-weight: 500;
+}
+
+.text-primary {
+  color: var(--correjir-primary) !important;
+}
+
+.text-success {
+  color: #198754 !important;
+}
+
+.text-warning {
+  color: #ffc107 !important;
+}
+
+.text-danger {
+  color: #dc3545 !important;
+}
+
+.bg-primary {
+  background-color: var(--correjir-primary) !important;
+}
+
+.bg-success {
+  background-color: #198754 !important;
+}
+
+.bg-warning {
+  background-color: #ffc107 !important;
+}
+
+.bg-danger {
+  background-color: #dc3545 !important;
+} 

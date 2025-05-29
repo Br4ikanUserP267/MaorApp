@@ -1,0 +1,112 @@
+:root {
+  --correjir-primary: #8e44ad;
+  --correjir-secondary: #9b59b6;
+  --correjir-light: #f5eef8;
+  --correjir-gradient: linear-gradient(135deg, #8e44ad 0%, #9b59b6 100%);
+}
+
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--correjir-light);
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.login-container::before {
+  content: '';
+  position: absolute;
+  width: 200%;
+  height: 200%;
+  background: var(--correjir-gradient);
+  opacity: 0.05;
+  transform: rotate(-15deg);
+  z-index: 0;
+}
+
+.login-card {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 1.5rem;
+  padding: 2.5rem;
+  box-shadow: 0 10px 30px rgba(142, 68, 173, 0.1);
+  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+  position: relative;
+  z-index: 1;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.login-card:hover {
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 15px 40px rgba(142, 68, 173, 0.2);
+}
+.Logo {
+       width: 8em;
+    display: block;         /* Para que funcione margin auto */
+    margin: 0 auto;       
+     text-align:center;
+}
+
+
+
+
+.input-maor {
+  border: 2px solid var(--correjir-light);
+  border-radius: 0.75rem;
+  padding: 0.75rem 1.25rem;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.input-maor:focus {
+  border-color: var(--correjir-primary);
+  box-shadow: 0 0 0 3px rgba(142, 68, 173, 0.2);
+  background: white;
+}
+
+.btn-maor {
+  background: var(--correjir-gradient);
+  color: white;
+  padding: 1rem;
+  border: none;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+
+
+.btn-maor:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(142, 68, 173, 0.3);
+}
+
+.btn-maor:hover::after {
+  left: 100%;
+}
+
+.separator {
+  display: flex;
+  align-items: center;
+  margin: 2rem 0;
+  color: var(--correjir-secondary);
+  font-weight: 500;
+}
+
+.separator::before,
+.separator::after {
+  content: '';
+  flex: 1;
+  border-bottom: 2px solid var(--correjir-light);
+  margin: 0 1rem;
+}
+
+
+
+/* Efectos adicionales */

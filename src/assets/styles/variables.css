@@ -1,0 +1,72 @@
+:root {
+  --correjir-primary: #8e44ad;
+  --correjir-secondary: #9b59b6;
+  --correjir-light: #f5eef8;
+  --correjir-dark: #6c3483;
+  --correjir-text: #2c3e50;
+  --correjir-border: #e0e0e0;
+}
+
+.btn-correjir {
+  background-color: var(--correjir-primary);
+  color: white;
+}
+
+.btn-correjir:hover {
+  background-color: var(--correjir-secondary);
+  color: white;
+}
+
+.bg-correjir-light {
+  background-color: var(--correjir-light);
+}
+
+.text-correjir {
+  color: var(--correjir-primary);
+}
+
+.border-correjir {
+  border-color: var(--correjir-primary);
+}
+
+.btn-whatsapp {
+  background-color: #25D366;
+  color: white;
+}
+
+.btn-whatsapp:hover {
+  background-color: #128C7E;
+  color: white;
+}
+
+.birthday-badge {
+  background-color: #ff6b6b;
+  color: white;
+  font-size: 0.7rem;
+}
+
+.loyalty-badge {
+  background-color: #feca57;
+  color: white;
+  font-size: 0.7rem;
+}
+
+.client-detail-card {
+  border-radius: 10px;
+  transition: all 0.3s;
+}
+
+.client-detail-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.spending-card {
+  border-left: 4px solid var(--correjir-primary);
+}
+
+.nav-tabs .nav-link.active {
+  color: var(--correjir-primary);
+  font-weight: bold;
+  border-bottom: 3px solid var(--correjir-primary);
+} 

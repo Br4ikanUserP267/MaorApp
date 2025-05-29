@@ -1,0 +1,100 @@
+.cashier-menu {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    width: 220px;
+    background-color: var(--light-text);
+    box-shadow: var(--shadow);
+    padding: 1rem;
+    transition: all 0.3s ease;
+    z-index: 1000;
+}
+
+.cashier-menu .logo-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--secondary-color);
+}
+
+.cashier-menu .logo-container img {
+    width: 35px;
+    height: 35px;
+}
+
+.cashier-menu .menu-items {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.cashier-menu .menu-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.8rem;
+    color: var(--text-color);
+    text-decoration: none;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+.cashier-menu .menu-item:hover,
+.cashier-menu .menu-item.active {
+    background-color: var(--secondary-color);
+    color: var(--primary-color);
+}
+
+.cashier-menu .menu-item i,
+.cashier-menu .menu-item svg {
+    color: var(--primary-color);
+    font-size: 1.1rem;
+}
+
+.cashier-menu .menu-item span {
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+/* Quick actions */
+.cashier-menu .quick-actions {
+    position: absolute;
+    bottom: 1rem;
+    left: 1rem;
+    right: 1rem;
+    padding: 1rem;
+    background-color: var(--secondary-color);
+    border-radius: 8px;
+}
+
+.cashier-menu .quick-actions button {
+    width: 100%;
+    margin-bottom: 0.5rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .cashier-menu {
+        transform: translateX(-100%);
+    }
+
+    .cashier-menu.show {
+        transform: translateX(0);
+    }
+
+    .menu-toggle {
+        display: block;
+        position: fixed;
+        top: 1rem;
+        left: 1rem;
+        z-index: 1001;
+        background-color: var(--primary-color);
+        color: var(--light-text);
+        padding: 0.5rem;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+} 

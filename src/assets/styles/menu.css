@@ -1,0 +1,60 @@
+.sidebar {
+  background-color: var(--maor-primary);
+  color: white;
+  transition: all 0.3s;
+}
+
+.sidebar-item {
+  transition: all 0.2s;
+  border-radius: 5px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.sidebar-item:hover {
+  background-color: var(--maor-secondary);
+  transform: translateX(5px);
+}
+
+.sidebar-item.active {
+  background-color: var(--maor-secondary);
+  font-weight: 500;
+}
+
+.sidebar-item small {
+  opacity: 0.8;
+  font-size: 0.75rem;
+}
+
+.sidebar hr {
+  opacity: 0.2;
+  margin: 1rem 0;
+}
+
+.sidebar .nav-link {
+  padding: 0;
+  color: white;
+  text-decoration: none;
+}
+
+.sidebar .nav-link:hover {
+  color: white;
+}
+
+.sidebar .user-profile {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 5px;
+  padding: 0.75rem;
+}
+
+.sidebar .user-profile img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.sidebar .user-profile small {
+  font-size: 0.75rem;
+  opacity: 0.8;
+} 

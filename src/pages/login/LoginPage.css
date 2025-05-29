@@ -1,0 +1,159 @@
+.login-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+}
+
+.login-card {
+  width: 100%;
+  max-width: 450px;
+  border: none;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+}
+
+.brand-name {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  margin-bottom: 0.5rem;
+  letter-spacing: 2px;
+}
+
+.brand-description {
+  color: var(--text-muted);
+  font-size: 1rem;
+  margin-bottom: 0;
+}
+
+.input-group {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.input-group-text {
+  background-color: white;
+  border: 1px solid #e0e0e0;
+  border-right: none;
+  color: var(--text-muted);
+  padding: 0.75rem 1rem;
+}
+
+.form-control {
+  border: 1px solid #e0e0e0;
+  border-left: none;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+}
+
+.form-control:focus {
+  box-shadow: none;
+  border-color: #e0e0e0;
+}
+
+.login-button {
+  padding: 0.75rem;
+  font-size: 1rem;
+  font-weight: 500;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.login-button:not(:disabled):hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.2);
+}
+
+.show-credentials-button {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+}
+
+.show-credentials-button:hover {
+  color: var(--primary-color);
+  background-color: rgba(var(--primary-rgb), 0.05);
+}
+
+.credentials-info {
+  background-color: rgba(var(--primary-rgb), 0.03);
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.credentials-info h6 {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.credential-card {
+  background-color: white;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.credential-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-color: var(--primary-color);
+}
+
+.credential-card strong {
+  color: var(--text-color);
+  font-size: 0.9rem;
+}
+
+.credential-card .badge {
+  font-weight: 500;
+  padding: 0.5em 0.75em;
+  font-size: 0.75rem;
+}
+
+.credential-details {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+  .login-card {
+    margin: 1rem;
+  }
+
+  .brand-name {
+    font-size: 2rem;
+  }
+
+  .login-card .card-body {
+    padding: 1.5rem !important;
+  }
+
+  .credentials-info {
+    padding: 1rem;
+  }
+} 
