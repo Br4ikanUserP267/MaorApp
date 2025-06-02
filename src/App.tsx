@@ -5,6 +5,7 @@ import { ToastContainer } from 'react-toastify';
 // Layouts
 import StaffLayout from './components/staff/layout/StaffLayout';
 import CashierLayout from './components/cashier/layout/CashierLayout';
+import EmployeeLayout from './components/employee/layout/EmployeeLayout';
 
 // Pages
 import LoginPage from './pages/login/LoginPage';
@@ -18,11 +19,13 @@ import CustomersPage from './pages/admin/CustomersPage';
 import ReportsPage from './pages/admin/ReportsPage';
 import PQRFPage from './pages/admin/PQRFPage';
 import CashierDashboard from './pages/cashier/CashierDashboard';
-import CashierSalesPage from './pages/cashier/sales/SalesPage';
+import CashierSalesPage from './pages/cashier/SalesPage';
 import EmployeeDashboard from './pages/employee/EmployeeDashboard';
-import InvoicePage from './pages/employee/InvoicePage';
 import LocalClientsPage from './pages/cashier/LocalClientsPage';
 import EmployeeLocalClientsPage from './pages/employee/LocalClientsPage';
+import ClientsPage from './pages/cashier/ClientsPage';
+import InvoicePage from './pages/cashier/InvoicePage';
+import EmployeeInvoicePage from './pages/employee/InvoicePage';
 
 // Styles
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -76,8 +79,9 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles 
     return <Navigate to="/" state={{ from: location }} replace />;
   }
 
+  // Verificar que el usuario tenga el rol correcto para acceder a estas rutas
   if (!userRole || !allowedRoles.includes(userRole)) {
-    return <Navigate to="/unauthorized" replace />;
+    return <Navigate to={`/${userRole}/dashboard`} replace />;
   }
 
   return <>{children}</>;
@@ -89,7 +93,6 @@ const App: React.FC = () => {
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<LoginPage />} />
-        <Route path="/unauthorized" element={<div>No autorizado</div>} />
 
         {/* Admin Routes */}
         <Route
@@ -98,16 +101,16 @@ const App: React.FC = () => {
             <ProtectedRoute allowedRoles={[ROLES.ADMIN]}>
               <StaffLayout role="admin">
                 <Routes>
+                  <Route path="/" element={<AdminDashboard />} />
                   <Route path="dashboard" element={<AdminDashboard />} />
+                  <Route path="customers" element={<CustomersPage />} />
+                  <Route path="sales" element={<SalesPage />} />
+                  <Route path="services" element={<ServicesPage />} />
+                  <Route path="products" element={<ProductsPage />} />
+                  <Route path="pqrf" element={<PQRFPage />} />
+                  <Route path="reports" element={<ReportsPage />} />
                   <Route path="appointments" element={<AppointmentsPage />} />
                   <Route path="employees" element={<EmployeesPage />} />
-                  <Route path="sales" element={<SalesPage />} />
-                  <Route path="products" element={<ProductsPage />} />
-                  <Route path="services" element={<ServicesPage />} />
-                  <Route path="customers" element={<CustomersPage />} />
-                  <Route path="reports" element={<ReportsPage />} />
-                  <Route path="pqrf" element={<PQRFPage />} />
-                  <Route path="" element={<Navigate to="dashboard" replace />} />
                 </Routes>
               </StaffLayout>
             </ProtectedRoute>
@@ -122,9 +125,11 @@ const App: React.FC = () => {
               <CashierLayout>
                 <Routes>
                   <Route path="dashboard" element={<CashierDashboard />} />
-                  <Route path="appointments" element={<AppointmentsPage />} />
+                  <Route path="clients" element={<ClientsPage />} />
                   <Route path="local-clients" element={<LocalClientsPage />} />
+                  <Route path="appointments" element={<AppointmentsPage />} />
                   <Route path="sales" element={<CashierSalesPage />} />
+                  <Route path="invoices" element={<InvoicePage />} />
                   <Route path="" element={<Navigate to="dashboard" replace />} />
                 </Routes>
               </CashierLayout>
@@ -137,15 +142,14 @@ const App: React.FC = () => {
           path="/employee/*"
           element={
             <ProtectedRoute allowedRoles={[ROLES.EMPLOYEE]}>
-              <StaffLayout role="employee">
+              <EmployeeLayout>
                 <Routes>
                   <Route path="dashboard" element={<EmployeeDashboard />} />
-                  <Route path="appointments" element={<AppointmentsPage />} />
                   <Route path="local-clients" element={<EmployeeLocalClientsPage />} />
-                  <Route path="invoices" element={<InvoicePage />} />
+                  <Route path="invoices" element={<EmployeeInvoicePage />} />
                   <Route path="" element={<Navigate to="dashboard" replace />} />
                 </Routes>
-              </StaffLayout>
+              </EmployeeLayout>
             </ProtectedRoute>
           }
         />

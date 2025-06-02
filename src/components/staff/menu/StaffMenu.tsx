@@ -1,109 +1,119 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { FaTachometerAlt, FaUsers, FaCalendarAlt, FaHandHoldingHeart, FaBoxOpen, 
-         FaUserTie, FaFileInvoiceDollar, FaChartBar, FaExclamationCircle, 
-         FaCashRegister, FaClipboardList, FaUserClock, FaFileInvoice } from 'react-icons/fa';
-
-interface MenuItem {
-  path: string;
-  icon: React.ReactNode;
-  label: string;
-}
+import { useNavigate } from 'react-router-dom';
+import { FaUser, FaSignOutAlt, FaShoppingCart, FaCalendarAlt, FaUsers, FaChartLine } from 'react-icons/fa';
+import './StaffMenu.css';
 
 interface StaffMenuProps {
-  role: 'admin' | 'cashier' | 'employee';
-  userName: string;
-  userRole: string;
-  userAvatar?: string;
+  role?: 'admin' | 'cashier' | 'employee';
 }
 
-const adminMenuItems: MenuItem[] = [
-  { path: '/admin/dashboard', icon: <FaTachometerAlt />, label: 'Dashboard' },
-  { path: '/admin/clients', icon: <FaUsers />, label: 'Clientes' },
-  { path: '/admin/appointments', icon: <FaCalendarAlt />, label: 'Citas' },
-  { path: '/admin/services', icon: <FaHandHoldingHeart />, label: 'Servicios' },
-  { path: '/admin/products', icon: <FaBoxOpen />, label: 'Productos' },
-  { path: '/admin/employees', icon: <FaUserTie />, label: 'Empleados' },
-  { path: '/admin/sales', icon: <FaFileInvoiceDollar />, label: 'Ventas' },
-  { path: '/admin/reports', icon: <FaChartBar />, label: 'Reportes' },
-  { path: '/admin/pqrf', icon: <FaExclamationCircle />, label: 'PQRF' }
-];
+const StaffMenu: React.FC<StaffMenuProps> = ({ role = 'employee' }) => {
+  const navigate = useNavigate();
 
-const cashierMenuItems: MenuItem[] = [
-  { path: '/cashier/dashboard', icon: <FaTachometerAlt />, label: 'Dashboard' },
-  { path: '/cashier/sales', icon: <FaCashRegister />, label: 'Ventas' },
-  { path: '/cashier/appointments', icon: <FaCalendarAlt />, label: 'Citas' },
-  { path: '/cashier/clients', icon: <FaUsers />, label: 'Clientes' },
-  { path: '/cashier/inventory', icon: <FaClipboardList />, label: 'Inventario' },
-  { path: '/cashier/shifts', icon: <FaUserClock />, label: 'Turnos' }
-];
+  const handleLogout = () => {
+    // Aquí iría la lógica de logout (limpiar tokens, etc.)
+    navigate('/login');
+  };
 
-const employeeMenuItems: MenuItem[] = [
-  { path: '/employee/dashboard', icon: <FaTachometerAlt />, label: 'Dashboard' },
-  { path: '/employee/appointments', icon: <FaCalendarAlt />, label: 'Citas' },
-  { path: '/employee/local-clients', icon: <FaUsers />, label: 'Clientes en Local' },
-  { path: '/employee/invoices', icon: <FaFileInvoice />, label: 'Facturas' }
-];
-
-const StaffMenu: React.FC<StaffMenuProps> = ({ role, userName, userRole, userAvatar }) => {
-  const location = useLocation();
-  const menuItems = role === 'admin' 
-    ? adminMenuItems 
-    : role === 'cashier'
-    ? cashierMenuItems
-    : employeeMenuItems;
-
-  const getRoleTitle = () => {
-    switch(role) {
+  const getMenuTitle = () => {
+    switch (role) {
       case 'admin':
-        return 'MENÚ ADMINISTRADORA';
+        return 'MENÚ ADMINISTRADOR';
       case 'cashier':
         return 'MENÚ CAJERO';
       case 'employee':
-        return 'MENÚ ESTILISTA';
+        return 'MENÚ EMPLEADO';
       default:
         return 'MENÚ';
     }
   };
 
+  const getUserInfo = () => {
+    switch (role) {
+      case 'admin':
+        return {
+          name: 'Usuario Administrador',
+          role: 'Administrador Principal'
+        };
+      case 'cashier':
+        return {
+          name: 'Usuario Cajero',
+          role: 'Cajero Principal'
+        };
+      case 'employee':
+        return {
+          name: 'Usuario Estilista',
+          role: 'Estilista Principal'
+        };
+      default:
+        return {
+          name: 'Usuario',
+          role: 'Empleado'
+        };
+    }
+  };
+
+  const getMenuItems = () => {
+    switch (role) {
+      case 'cashier':
+        return [
+          { path: '/cashier/dashboard', icon: <FaChartLine />, label: 'Dashboard' },
+          { path: '/cashier/sales', icon: <FaShoppingCart />, label: 'Ventas' },
+          { path: '/cashier/appointments', icon: <FaCalendarAlt />, label: 'Citas' },
+          { path: '/cashier/clients', icon: <FaUsers />, label: 'Clientes' }
+        ];
+      case 'employee':
+        return [
+          { path: '/employee/dashboard', icon: <FaUser />, label: 'Dashboard' },
+          { path: '/employee/appointments', icon: <FaUser />, label: 'Citas' },
+          { path: '/employee/clients', icon: <FaUser />, label: 'Clientes' },
+          { path: '/employee/services', icon: <FaUser />, label: 'Servicios' }
+        ];
+      default:
+        return [];
+    }
+  };
+
+  const userInfo = getUserInfo();
+  const menuItems = getMenuItems();
+
   return (
-    <div className="staff-sidebar">
-      <div className="staff-brand">
-        <h2><i className="fas fa-spa me-2"></i>MAOR</h2>
-        <p>Centro de Belleza - Sincelejo</p>
+    <div className="staff-menu">
+      <div className="menu-header">
+        <h2>MAOR</h2>
+        <p>Sistema de Gestión</p>
       </div>
 
       <div className="menu-section">
-        <div className="menu-section-title">
-          {getRoleTitle()}
-        </div>
-        <div className="staff-menu">
-          {menuItems.map((item) => (
-            <Link
-              key={item.path}
-              to={item.path}
-              className={`menu-item ${location.pathname === item.path ? 'active' : ''}`}
+        <h5>{getMenuTitle()}</h5>
+        <div className="menu-items">
+          {menuItems.map((item, index) => (
+            <a 
+              key={index}
+              href={item.path} 
+              className={`menu-item ${window.location.pathname === item.path ? 'active' : ''}`}
             >
-              <span className="menu-icon">{item.icon}</span>
-              <span className="menu-label">{item.label}</span>
-            </Link>
+              {item.icon}
+              <span>{item.label}</span>
+            </a>
           ))}
         </div>
       </div>
 
       <div className="user-info">
-        <div className="user-info-content">
-          <img
-            src={userAvatar || 'https://via.placeholder.com/40'}
-            alt={userName}
-            className="user-avatar"
-          />
-          <div className="user-details">
-            <p className="user-name">{userName}</p>
-            <p className="user-role">{userRole}</p>
-          </div>
+        <div className="user-avatar">
+          <FaUser />
+        </div>
+        <div className="user-details">
+          <p className="user-name">{userInfo.name}</p>
+          <p className="user-role">{userInfo.role}</p>
         </div>
       </div>
+
+      <button className="logout-button" onClick={handleLogout}>
+        <FaSignOutAlt />
+        <span>Salir</span>
+      </button>
     </div>
   );
 };

@@ -1,14 +1,18 @@
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   FaSpa, 
+  FaTachometerAlt, 
   FaUsers, 
-  FaCalendarAlt,
+  FaCalendarAlt, 
   FaFileInvoiceDollar,
+  FaStore,
+  FaFileAlt,
   FaBars,
-  FaTimes
+  FaTimes,
+  FaSignOutAlt
 } from 'react-icons/fa';
-import '../../../assets/styles/cashier/cashier-layout.css';
+import '../../../assets/styles/admin/admin-layout.css';
 
 interface CashierLayoutProps {
   children: React.ReactNode;
@@ -17,36 +21,48 @@ interface CashierLayoutProps {
 const CashierLayout: React.FC<CashierLayoutProps> = ({ children }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   const menuItems = [
     { 
+      path: '/cashier/dashboard', 
+      name: 'Dashboard', 
+      icon: <FaTachometerAlt />
+    },
+    { 
       path: '/cashier/clients', 
-      name: 'Clientes', 
-      icon: <FaUsers />,
-      description: 'Gestión de clientes'
+      name: 'Gestión de Clientes', 
+      icon: <FaUsers />
     },
     { 
       path: '/cashier/local-clients', 
       name: 'Clientes en Local', 
-      icon: <FaUsers />,
-      description: 'Clientes actualmente en el local'
+      icon: <FaStore />
     },
     { 
       path: '/cashier/appointments', 
       name: 'Gestión de Citas', 
-      icon: <FaCalendarAlt />,
-      description: 'Administrar citas y horarios'
+      icon: <FaCalendarAlt />
     },
     { 
       path: '/cashier/sales', 
-      name: 'Ventas', 
-      icon: <FaFileInvoiceDollar />,
-      description: 'Registro de ventas'
+      name: 'Gestión de Ventas', 
+      icon: <FaFileInvoiceDollar />
+    },
+    { 
+      path: '/cashier/invoices', 
+      name: 'Facturas', 
+      icon: <FaFileAlt />
     }
   ];
 
+  const handleLogout = () => {
+    // Aquí iría la lógica de logout (limpiar tokens, etc.)
+    navigate('/login');
+  };
+
   return (
-    <div className="cashier-layout">
+    <div className="admin-layout">
       <button 
         className="menu-toggle"
         onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -54,13 +70,13 @@ const CashierLayout: React.FC<CashierLayoutProps> = ({ children }) => {
         {isMenuOpen ? <FaTimes /> : <FaBars />}
       </button>
 
-      <div className={`sidebar ${isMenuOpen ? 'show' : ''}`}>
+      <aside className={`sidebar ${isMenuOpen ? 'show' : ''}`}>
         <div className="brand-container">
           <h2><FaSpa className="me-2" />MAOR</h2>
           <p>Centro de Belleza - Sincelejo</p>
         </div>
 
-        <div className="menu-section">
+        <nav className="menu-section">
           <h5 className="menu-section-title">MENÚ CAJERO</h5>
           <div className="nav-menu">
             {menuItems.map((item) => (
@@ -75,26 +91,30 @@ const CashierLayout: React.FC<CashierLayoutProps> = ({ children }) => {
               </Link>
             ))}
           </div>
-        </div>
+        </nav>
 
         <div className="user-info">
           <div className="user-info-content">
-            <img 
-              src="https://via.placeholder.com/40" 
-              alt="Cashier avatar" 
-              className="user-avatar"
-            />
+            <div className="user-avatar">
+              <span>C</span>
+            </div>
             <div className="user-details">
               <p className="user-name">Usuario Cajero</p>
-              <p className="user-role">Cajero Principal</p>
             </div>
           </div>
+          <button 
+            className="logout-button"
+            onClick={handleLogout}
+          >
+            <FaSignOutAlt />
+            <span>Salir</span>
+          </button>
         </div>
-      </div>
+      </aside>
 
-      <div className="cashier-content">
+      <main className="admin-content">
         {children}
-      </div>
+      </main>
     </div>
   );
 };

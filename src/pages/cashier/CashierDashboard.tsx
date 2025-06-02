@@ -18,7 +18,10 @@ import {
   Legend,
   ResponsiveContainer
 } from 'recharts';
-import BasePage from '../../components/cashier/base/BasePage';
+import StaffLayout from '../../components/staff/layout/StaffLayout';
+import { format } from 'date-fns';
+import { es } from 'date-fns/locale';
+import './CashierDashboard.css';
 
 const CashierDashboard: React.FC = () => {
   // Datos de ejemplo para las gráficas
@@ -40,9 +43,16 @@ const CashierDashboard: React.FC = () => {
   };
 
   return (
-    <BasePage title="Panel de Control">
-      <Container fluid className="p-0">
-        <div className="d-flex justify-content-between align-items-center mb-4">
+    <StaffLayout role="cashier">
+      <Container fluid className="dashboard-container px-4 py-4">
+        <div className="dashboard-header mb-4">
+          <h2 className="mb-1">Panel de Control</h2>
+          <p className="text-muted mb-0">
+            {format(new Date(), "EEEE, d 'de' MMMM", { locale: es })}
+          </p>
+        </div>
+
+        <div className="d-flex justify-content-end mb-4">
           <div className="export-buttons">
             <button className="btn btn-export btn-export-excel me-2" onClick={handleExportExcel}>
               <FaFileExcel /> Exportar Excel
@@ -54,57 +64,57 @@ const CashierDashboard: React.FC = () => {
         </div>
         
         <Row className="g-4 mb-4">
-          <Col xs={12} md={6} lg={3}>
-            <Card className="h-100 shadow-sm">
+          <Col xs={12} sm={6} md={3}>
+            <Card className="stat-card h-100 border-0 shadow-sm">
               <Card.Body className="d-flex align-items-center">
-                <div className="rounded-circle p-3 bg-primary bg-opacity-10 me-3">
-                  <FaUsers className="text-primary" size={24} />
+                <div className="stat-icon-wrapper primary me-3">
+                  <FaUsers size={24} />
                 </div>
-                <div>
-                  <h6 className="mb-0 text-muted">Clientes Hoy</h6>
-                  <h3 className="mb-0 mt-1">45</h3>
+                <div className="stat-content">
+                  <h6 className="text-muted mb-1">Clientes Hoy</h6>
+                  <h3 className="mb-0">45</h3>
                 </div>
               </Card.Body>
             </Card>
           </Col>
           
-          <Col xs={12} md={6} lg={3}>
-            <Card className="h-100 shadow-sm">
+          <Col xs={12} sm={6} md={3}>
+            <Card className="stat-card h-100 border-0 shadow-sm">
               <Card.Body className="d-flex align-items-center">
-                <div className="rounded-circle p-3 bg-success bg-opacity-10 me-3">
-                  <FaCalendarAlt className="text-success" size={24} />
+                <div className="stat-icon-wrapper success me-3">
+                  <FaCalendarAlt size={24} />
                 </div>
-                <div>
-                  <h6 className="mb-0 text-muted">Citas Hoy</h6>
-                  <h3 className="mb-0 mt-1">12</h3>
+                <div className="stat-content">
+                  <h6 className="text-muted mb-1">Citas Hoy</h6>
+                  <h3 className="mb-0">12</h3>
                 </div>
               </Card.Body>
             </Card>
           </Col>
           
-          <Col xs={12} md={6} lg={3}>
-            <Card className="h-100 shadow-sm">
+          <Col xs={12} sm={6} md={3}>
+            <Card className="stat-card h-100 border-0 shadow-sm">
               <Card.Body className="d-flex align-items-center">
-                <div className="rounded-circle p-3 bg-warning bg-opacity-10 me-3">
-                  <FaShoppingCart className="text-warning" size={24} />
+                <div className="stat-icon-wrapper warning me-3">
+                  <FaShoppingCart size={24} />
                 </div>
-                <div>
-                  <h6 className="mb-0 text-muted">Ventas del Día</h6>
-                  <h3 className="mb-0 mt-1">$1,250</h3>
+                <div className="stat-content">
+                  <h6 className="text-muted mb-1">Ventas del Día</h6>
+                  <h3 className="mb-0">$1,250</h3>
                 </div>
               </Card.Body>
             </Card>
           </Col>
           
-          <Col xs={12} md={6} lg={3}>
-            <Card className="h-100 shadow-sm">
+          <Col xs={12} sm={6} md={3}>
+            <Card className="stat-card h-100 border-0 shadow-sm">
               <Card.Body className="d-flex align-items-center">
-                <div className="rounded-circle p-3 bg-danger bg-opacity-10 me-3">
-                  <FaChartLine className="text-danger" size={24} />
+                <div className="stat-icon-wrapper info me-3">
+                  <FaChartLine size={24} />
                 </div>
-                <div>
-                  <h6 className="mb-0 text-muted">Meta Diaria</h6>
-                  <h3 className="mb-0 mt-1">75%</h3>
+                <div className="stat-content">
+                  <h6 className="text-muted mb-1">Meta Diaria</h6>
+                  <h3 className="mb-0">75%</h3>
                 </div>
               </Card.Body>
             </Card>
@@ -113,9 +123,9 @@ const CashierDashboard: React.FC = () => {
 
         <Row>
           <Col xs={12}>
-            <Card className="shadow-sm">
-              <Card.Header className="bg-white">
-                <h5 className="mb-0">Ventas vs Citas</h5>
+            <Card className="chart-container border-0 shadow-sm">
+              <Card.Header className="bg-white border-bottom-0 py-3">
+                <h5 className="mb-0 text-dark fw-bold">Ventas vs Citas</h5>
               </Card.Header>
               <Card.Body>
                 <div style={{ height: '400px' }}>
@@ -145,7 +155,7 @@ const CashierDashboard: React.FC = () => {
           </Col>
         </Row>
       </Container>
-    </BasePage>
+    </StaffLayout>
   );
 };
 

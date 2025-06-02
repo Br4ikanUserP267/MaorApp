@@ -1,0 +1,88 @@
+.time-slot-header {
+  display: flex;
+  align-items: center;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 1rem;
+  padding: 0.5rem 1rem;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+}
+
+.client-card {
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  background: white;
+}
+
+.client-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.client-card.active {
+  border-left: 4px solid #198754;
+}
+
+.client-card.waiting {
+  border-left: 4px solid #ffc107;
+}
+
+.client-card.completed {
+  border-left: 4px solid #6c757d;
+}
+
+.service-details {
+  background-color: #f8f9fa;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.progress {
+  height: 8px;
+  background-color: #e9ecef;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  transition: width 0.3s ease-in-out;
+}
+
+.products-list {
+  background-color: #f8f9fa;
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+.product-item {
+  padding: 0.5rem;
+  border-radius: 4px;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.product-item:hover {
+  background-color: #e9ecef;
+}
+
+.progress-controls {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.progress-controls button {
+  flex: 1;
+}
+
+@media (max-width: 768px) {
+  .time-slot-header {
+    font-size: 1rem;
+    padding: 0.5rem;
+  }
+
+  .service-details,
+  .products-list {
+    padding: 0.75rem;
+  }
+} 

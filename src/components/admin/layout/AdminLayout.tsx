@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   FaSpa, 
   FaTachometerAlt, 
@@ -12,7 +12,8 @@ import {
   FaChartBar,
   FaExclamationCircle,
   FaBars,
-  FaTimes
+  FaTimes,
+  FaSignOutAlt
 } from 'react-icons/fa';
 import '../../../assets/styles/variables.css';
 import '../../../assets/styles/admin/admin-layout.css';
@@ -24,6 +25,7 @@ interface AdminLayoutProps {
 const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   const menuItems = [
     { 
@@ -33,33 +35,28 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     },
     { 
       path: '/admin/customers', 
-      name: 'Clientes', 
+      name: 'Gestión de Clientes', 
       icon: <FaUsers />
     },
     { 
-      path: '/admin/appointments', 
-      name: 'Citas', 
-      icon: <FaCalendarAlt />
+      path: '/admin/sales', 
+      name: 'Gestión de Ventas', 
+      icon: <FaFileInvoiceDollar />
     },
     { 
       path: '/admin/services', 
-      name: 'Servicios', 
+      name: 'Gestión de Servicios', 
       icon: <FaConciergeBell />
     },
     { 
       path: '/admin/products', 
-      name: 'Productos', 
+      name: 'Gestión de Productos', 
       icon: <FaBoxOpen />
     },
     { 
-      path: '/admin/employees', 
-      name: 'Empleados', 
-      icon: <FaUserTie />
-    },
-    { 
-      path: '/admin/sales', 
-      name: 'Ventas', 
-      icon: <FaFileInvoiceDollar />
+      path: '/admin/pqrf', 
+      name: 'PQRF', 
+      icon: <FaExclamationCircle />
     },
     { 
       path: '/admin/reports', 
@@ -67,11 +64,21 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
       icon: <FaChartBar />
     },
     { 
-      path: '/admin/pqrf', 
-      name: 'PQRF', 
-      icon: <FaExclamationCircle />
+      path: '/admin/appointments', 
+      name: 'Gestión de Citas', 
+      icon: <FaCalendarAlt />
+    },
+    { 
+      path: '/admin/employees', 
+      name: 'Gestión de Empleados', 
+      icon: <FaUserTie />
     }
   ];
+
+  const handleLogout = () => {
+    // Aquí iría la lógica de logout (limpiar tokens, etc.)
+    navigate('/login');
+  };
 
   return (
     <div className="admin-layout">
@@ -82,14 +89,14 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
         {isMenuOpen ? <FaTimes /> : <FaBars />}
       </button>
 
-      <div className={`sidebar ${isMenuOpen ? 'show' : ''}`}>
+      <aside className={`sidebar ${isMenuOpen ? 'show' : ''}`}>
         <div className="brand-container">
           <h2><FaSpa className="me-2" />MAOR</h2>
           <p>Centro de Belleza - Sincelejo</p>
         </div>
 
-        <div className="menu-section">
-          <h5 className="menu-section-title">MENÚ ADMINISTRADORA</h5>
+        <nav className="menu-section">
+          <h5 className="menu-section-title">MENÚ ADMINISTRADOR</h5>
           <div className="nav-menu">
             {menuItems.map((item) => (
               <Link
@@ -103,26 +110,30 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
               </Link>
             ))}
           </div>
-        </div>
+        </nav>
 
         <div className="user-info">
           <div className="user-info-content">
-            <img 
-              src="https://via.placeholder.com/40" 
-              alt="Admin avatar" 
-              className="user-avatar"
-            />
+            <div className="user-avatar">
+              <span>A</span>
+            </div>
             <div className="user-details">
               <p className="user-name">Usuario Administrador</p>
-              <p className="user-role">Administradora Principal</p>
             </div>
           </div>
+          <button 
+            className="logout-button"
+            onClick={handleLogout}
+          >
+            <FaSignOutAlt />
+            <span>Salir</span>
+          </button>
         </div>
-      </div>
+      </aside>
 
-      <div className="admin-content">
+      <main className="admin-content">
         {children}
-      </div>
+      </main>
     </div>
   );
 };

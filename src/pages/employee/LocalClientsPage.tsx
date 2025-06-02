@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Card, Row, Col, Button, Badge, Modal, Form, Tab, Tabs, Nav } from 'react-bootstrap';
-import { FaSpa, FaCube, FaUserMd, FaClock, FaCalendarAlt, FaUsers, FaUserCircle, FaBars } from 'react-icons/fa';
-import { Link, useLocation } from 'react-router-dom';
+import { Container, Card, Button, Badge, Modal, Form, Tab, Tabs } from 'react-bootstrap';
+import { FaSpa, FaCube, FaUserMd, FaClock } from 'react-icons/fa';
 import { toast } from 'react-toastify';
+import StaffLayout from '../../components/staff/layout/StaffLayout';
 import localClientService, { Product, Service, Professional } from '../../services/localClientService';
 
 interface LocalClient {
@@ -47,17 +47,12 @@ const EmployeeLocalClientsPage: React.FC = () => {
     role: 'Dermatóloga'
   };
 
-  const location = useLocation();
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-
   // Group clients by time slots (morning, afternoon, evening)
   const timeSlots = {
     morning: clients.filter(client => client.status === 'waiting'),
     current: clients.filter(client => client.status === 'active'),
     completed: clients.filter(client => client.status === 'completed')
   };
-
-  const [showMobileMenu, setShowMobileMenu] = useState(false);
 
   useEffect(() => {
     const loadData = async () => {
@@ -68,7 +63,7 @@ const EmployeeLocalClientsPage: React.FC = () => {
         ]);
         
         // Filter clients to only show those assigned to the current professional
-        const mockClients = [
+        const mockClients: LocalClient[] = [
           {
             id: 1,
             name: "María González",
@@ -164,6 +159,43 @@ const EmployeeLocalClientsPage: React.FC = () => {
     }
   };
 
+  const handleAddService = async (clientId: number) => {
+    if (!selectedService) {
+      toast.error('Por favor seleccione un servicio');
+      return;
+    }
+
+    try {
+      const service = services.find(s => s.id === parseInt(selectedService));
+      if (service) {
+        setClients(prevClients => {
+          return prevClients.map(client => {
+            if (client.id === clientId) {
+              return {
+                ...client,
+                service: {
+                  name: service.name,
+                  price: service.price,
+                  professional: currentEmployee.name,
+                  duration: service.duration,
+                  progress: 0
+                }
+              };
+            }
+            return client;
+          });
+        });
+        toast.success('Servicio agregado exitosamente');
+        setShowServiceModal(false);
+        setSelectedService('');
+        setServiceNotes('');
+      }
+    } catch (error) {
+      console.error('Error adding service:', error);
+      toast.error('Error al agregar el servicio');
+    }
+  };
+
   const handleUpdateServiceProgress = async (clientId: number, progress: number) => {
     setClients(prevClients => {
       return prevClients.map(client => {
@@ -188,70 +220,22 @@ const EmployeeLocalClientsPage: React.FC = () => {
   };
 
   return (
-    <div className="employee-page">
-      {/* Desktop Sidebar */}
-      <div className="sidebar desktop-only">
-        <h1 className="brand">MAOR</h1>
-        <p className="panel-title">Panel de Empleado</p>
-        
-        <nav className="sidebar-nav">
-          <Link to="/employee/local-clients" className="nav-link active">
-            <FaUsers className="nav-icon" />
-            Mis Clientes
-          </Link>
-        </nav>
-
-        <div className="employee-info">
-          <FaUserCircle className="employee-avatar" />
-          <div className="employee-details">
-            <h2 className="employee-name">Dra. Laura Martinez</h2>
-            <p className="employee-role">Dermatóloga</p>
+    <StaffLayout role="employee">
+      <Container fluid className="py-4">
+        <div className="d-flex justify-content-between align-items-center mb-4">
+          <div>
+            <h2 className="mb-1">Clientes en Local</h2>
+            <p className="text-muted mb-0">
+              {new Date().toLocaleDateString('es-ES', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+              })}
+            </p>
           </div>
         </div>
-      </div>
 
-      {/* Mobile Header */}
-      <div className="mobile-header mobile-only">
-        <Button 
-          variant="link" 
-          className="menu-button"
-          onClick={() => setShowMobileMenu(!showMobileMenu)}
-        >
-          <FaBars />
-        </Button>
-        <h1 className="brand">MAOR</h1>
-        <div className="employee-avatar-mobile">
-          <FaUserCircle />
-        </div>
-      </div>
-
-      {/* Mobile Menu */}
-      {showMobileMenu && (
-        <div className="mobile-menu">
-          <div className="mobile-menu-header">
-            <div className="employee-info">
-              <FaUserCircle className="employee-avatar" />
-              <div className="employee-details">
-                <h2 className="employee-name">Dra. Laura Martinez</h2>
-                <p className="employee-role">Dermatóloga</p>
-              </div>
-            </div>
-          </div>
-          <nav className="mobile-nav">
-            <Link 
-              to="/employee/local-clients" 
-              className="nav-link active"
-              onClick={() => setShowMobileMenu(false)}
-            >
-              <FaUsers className="nav-icon" />
-              Mis Clientes
-            </Link>
-          </nav>
-        </div>
-      )}
-
-      <div className="main-content">
-        <Container fluid className="py-4">
           <div className="calendar-grid">
             {/* Current Treatments */}
             {timeSlots.current.length > 0 && (
@@ -308,7 +292,6 @@ const EmployeeLocalClientsPage: React.FC = () => {
             )}
           </div>
         </Container>
-      </div>
 
       {/* Product Modal */}
       <Modal show={showProductModal} onHide={() => setShowProductModal(false)}>
@@ -438,7 +421,7 @@ const EmployeeLocalClientsPage: React.FC = () => {
           </Form>
         </Modal.Body>
       </Modal>
-    </div>
+    </StaffLayout>
   );
 };
 
@@ -475,6 +458,7 @@ const ClientCard: React.FC<ClientCardProps> = ({
               </div>
             </div>
           </div>
+          
           {client.status === 'active' && (
             <div className="mt-2">
               <label className="d-flex justify-content-between small mb-1">

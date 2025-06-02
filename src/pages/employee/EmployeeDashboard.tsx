@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Row, Col, Table, Badge, Container } from 'react-bootstrap';
-import StaffLayout from '../../components/staff/layout/StaffLayout';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { 
@@ -88,8 +87,8 @@ const EmployeeDashboard: React.FC = () => {
     setAppointments(mockAppointments);
 
     setStats({
-      weekly: 450000,
-      monthly: 1800000,
+      weekly: 45000,
+      monthly: 1800,
       appointmentsToday: 5,
       appointmentsWeek: 25
     });
@@ -114,111 +113,114 @@ const EmployeeDashboard: React.FC = () => {
   };
 
   return (
-    <StaffLayout role="estilista">
-      <Container fluid className="dashboard-container">
-        <div className="dashboard-header">
-          <h2>Panel de Control</h2>
-          <p className="text-muted">
-            {format(new Date(), "EEEE, d 'de' MMMM", { locale: es })}
-          </p>
-        </div>
+    <Container fluid className="py-4">
+      <div className="dashboard-header mb-4">
+        <h2 className="mb-1">Panel de Control</h2>
+        <p className="text-muted mb-0">
+          {format(new Date(), "EEEE, d 'de' MMMM", { locale: es })}
+        </p>
+      </div>
 
-        <Row className="g-4 mb-4">
-          <Col xs={6} md={3}>
-            <Card className="stat-card">
-              <Card.Body>
-                <div className="stat-icon-wrapper primary">
-                  <FaDollarSign size={24} />
-                </div>
-                <div className="stat-content">
-                  <h6>Ventas Semana</h6>
-                  <h3>${stats.weekly.toLocaleString()}</h3>
-                </div>
-              </Card.Body>
-            </Card>
-          </Col>
-          <Col xs={6} md={3}>
-            <Card className="stat-card">
-              <Card.Body>
-                <div className="stat-icon-wrapper success">
-                  <FaDollarSign size={24} />
-                </div>
-                <div className="stat-content">
-                  <h6>Ventas Mes</h6>
-                  <h3>${stats.monthly.toLocaleString()}</h3>
-                </div>
-              </Card.Body>
-            </Card>
-          </Col>
-          <Col xs={6} md={3}>
-            <Card className="stat-card">
-              <Card.Body>
-                <div className="stat-icon-wrapper warning">
-                  <FaClock size={24} />
-                </div>
-                <div className="stat-content">
-                  <h6>Citas Hoy</h6>
-                  <h3>{stats.appointmentsToday}</h3>
-                </div>
-              </Card.Body>
-            </Card>
-          </Col>
-          <Col xs={6} md={3}>
-            <Card className="stat-card">
-              <Card.Body>
-                <div className="stat-icon-wrapper info">
-                  <FaCalendarAlt size={24} />
-                </div>
-                <div className="stat-content">
-                  <h6>Citas Semana</h6>
-                  <h3>{stats.appointmentsWeek}</h3>
-                </div>
-              </Card.Body>
-            </Card>
-          </Col>
-        </Row>
+      <Row className="g-4 mb-4">
+        <Col xs={12} sm={6} md={3}>
+          <Card className="stat-card h-100 border-0 shadow-sm">
+            <Card.Body className="d-flex align-items-center">
+              <div className="stat-icon-wrapper primary me-3">
+                <FaDollarSign size={24} />
+              </div>
+              <div className="stat-content">
+                <h6 className="text-muted mb-1">Ventas Semana</h6>
+                <h3 className="mb-0">${stats.weekly.toLocaleString()}</h3>
+              </div>
+            </Card.Body>
+          </Card>
+        </Col>
+        <Col xs={12} sm={6} md={3}>
+          <Card className="stat-card h-100 border-0 shadow-sm">
+            <Card.Body className="d-flex align-items-center">
+              <div className="stat-icon-wrapper success me-3">
+                <FaDollarSign size={24} />
+              </div>
+              <div className="stat-content">
+                <h6 className="text-muted mb-1">Ventas Mes</h6>
+                <h3 className="mb-0">${stats.monthly.toLocaleString()}</h3>
+              </div>
+            </Card.Body>
+          </Card>
+        </Col>
+        <Col xs={12} sm={6} md={3}>
+          <Card className="stat-card h-100 border-0 shadow-sm">
+            <Card.Body className="d-flex align-items-center">
+              <div className="stat-icon-wrapper warning me-3">
+                <FaClock size={24} />
+              </div>
+              <div className="stat-content">
+                <h6 className="text-muted mb-1 text-dark fw-bold">Citas Hoy</h6>
+                <h3 className="mb-0">{stats.appointmentsToday}</h3>
+              </div>
+            </Card.Body>
+          </Card>
+        </Col>
+        <Col xs={12} sm={6} md={3}>
+          <Card className="stat-card h-100 border-0 shadow-sm">
+            <Card.Body className="d-flex align-items-center">
+              <div className="stat-icon-wrapper info me-3">
+                <FaCalendarAlt size={24} />
+              </div>
+              <div className="stat-content">
+                <h6 className="text-muted mb-1">Citas Semana</h6>
+                <h3 className="mb-0">{stats.appointmentsWeek}</h3>
+              </div>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
 
-        <Card className="appointments-card">
-          <Card.Header>
-            <h5 className="mb-0">Citas de Hoy</h5>
-          </Card.Header>
-          <Card.Body className="p-0">
-            {appointments
+      <Card className="border-0 shadow-sm">
+        <Card.Header className="bg-white border-bottom-0">
+          <h5 className="mb-0 text-dark fw-bold">Citas de Hoy</h5>
+        </Card.Header>
+        <Card.Body className="p-0">
+          {appointments.length > 0 ? (
+            appointments
               .filter(apt => apt.date === format(new Date(), 'yyyy-MM-dd'))
               .map(appointment => (
-                <div key={appointment.id} className="appointment-item">
-                  <div className="appointment-time">
-                    <FaClock className="me-2" />
-                    {appointment.time}
-                  </div>
-                  <div className="appointment-details">
-                    <div className="customer-info">
-                      <h6>{appointment.customer.name}</h6>
-                      <a href={`tel:${appointment.customer.phone}`} className="phone-link">
-                        <FaPhoneAlt size={14} className="me-1" />
-                        {appointment.customer.phone}
-                      </a>
+                <div key={appointment.id} className="appointment-item p-3 border-bottom">
+                  <div className="d-flex align-items-center justify-content-between">
+                    <div className="d-flex align-items-center">
+                      <div className="appointment-time me-4">
+                        <FaClock className="me-2 text-primary" />
+                        <span className="fw-bold">{appointment.time}</span>
+                      </div>
+                      <div className="customer-info">
+                        <h6 className="mb-1">{appointment.customer.name}</h6>
+                        <a href={`tel:${appointment.customer.phone}`} className="phone-link text-muted text-decoration-none">
+                          <FaPhoneAlt size={14} className="me-1" />
+                          {appointment.customer.phone}
+                        </a>
+                      </div>
                     </div>
-                    <div className="service-info">
-                      <div className="service-name">{appointment.service.name}</div>
-                      <div className="service-price">${appointment.service.price.toLocaleString()}</div>
-                    </div>
-                    <div className="appointment-status">
-                      {getStatusBadge(appointment.status)}
+                    <div className="d-flex align-items-center">
+                      <div className="service-info text-end me-3">
+                        <div className="service-name fw-bold">{appointment.service.name}</div>
+                        <div className="service-price text-success">${appointment.service.price.toLocaleString()}</div>
+                      </div>
+                      <div className="appointment-status">
+                        {getStatusBadge(appointment.status)}
+                      </div>
                     </div>
                   </div>
                 </div>
-              ))}
-            {appointments.filter(apt => apt.date === format(new Date(), 'yyyy-MM-dd')).length === 0 && (
-              <div className="no-appointments">
-                <FaCalendarAlt size={40} className="text-muted mb-3" />
-                <p>No hay citas programadas para hoy</p>
-              </div>
-            )}
-          </Card.Body>
-        </Card>
-      </Container>
-    </StaffLayout>
+              ))
+          ) : (
+            <div className="no-appointments text-center py-5">
+              <FaCalendarAlt size={40} className="text-muted mb-3" />
+              <p className="text-muted mb-0">No hay citas programadas para hoy</p>
+            </div>
+          )}
+        </Card.Body>
+      </Card>
+    </Container>
   );
 };
 

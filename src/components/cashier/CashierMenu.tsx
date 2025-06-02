@@ -51,13 +51,12 @@ const CashierMenu: React.FC = () => {
           </ul>
         </div>
       </div>
-      <div className="position-absolute bottom-0 start-0 p-3 w-100">
-        <div className="d-flex align-items-center p-2" style={{ backgroundColor: 'rgba(0,0,0,0.2)', borderRadius: '5px' }}>
-          <img src="https://via.placeholder.com/40" className="rounded-circle me-2" alt="Usuario" />
-          <div>
-            <small className="d-block">Usuario Cajero</small>
-            <small className="text-white-50">Cajero Principal</small>
-          </div>
+      
+      <div className="d-flex align-items-center p-2" style={{ backgroundColor: 'rgba(0,0,0,0.2)', borderRadius: '5px' }}>
+        <img src="https://via.placeholder.com/40" className="rounded-circle me-2" alt="Usuario" />
+        <div>
+          <small className="d-block">Usuario Cajero</small>
+          <small className="text-white-50">Cajero Principal</small>
         </div>
       </div>
     </div>

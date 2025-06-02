@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import StaffMenu from '../menu/StaffMenu';
+import { useNavigate } from 'react-router-dom';
+import AdminLayout from '../../admin/layout/AdminLayout';
 import '../../../assets/styles/staff-layout.css';
 
 interface StaffLayoutProps {
@@ -9,25 +10,15 @@ interface StaffLayoutProps {
 
 const StaffLayout: React.FC<StaffLayoutProps> = ({ children, role }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  // Mock user data - in a real app, this would come from authentication context
-  const userData = {
-    userName: role === 'admin' 
-      ? 'Usuario Administrador' 
-      : role === 'cashier'
-      ? 'Usuario Cajero'
-      : 'Usuario Estilista',
-    userRole: role === 'admin' 
-      ? 'Administradora Principal' 
-      : role === 'cashier'
-      ? 'Cajero Principal'
-      : 'Estilista Principal',
-    userAvatar: 'https://via.placeholder.com/40'
-  };
+  const navigate = useNavigate();
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
+
+  if (role === 'admin') {
+    return <AdminLayout>{children}</AdminLayout>;
+  }
 
   return (
     <div className="staff-layout">
@@ -40,12 +31,7 @@ const StaffLayout: React.FC<StaffLayoutProps> = ({ children, role }) => {
       </button>
 
       <div className={`staff-sidebar ${isMobileMenuOpen ? 'show' : ''}`}>
-        <StaffMenu
-          role={role}
-          userName={userData.userName}
-          userRole={userData.userRole}
-          userAvatar={userData.userAvatar}
-        />
+        {/* Aquí iría el menú para otros roles */}
       </div>
 
       <div 

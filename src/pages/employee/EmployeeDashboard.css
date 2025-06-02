@@ -1,1 +1,158 @@
- 
+.dashboard-container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.dashboard-header {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.dashboard-header h2 {
+  color: #2c3e50;
+  font-size: 1.75rem;
+  font-weight: 600;
+}
+
+.stat-card {
+  transition: transform 0.2s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+}
+
+.stat-icon-wrapper {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stat-icon-wrapper.primary {
+  background-color: rgba(155, 89, 182, 0.1);
+  color: #9b59b6;
+}
+
+.stat-icon-wrapper.success {
+  background-color: rgba(46, 204, 113, 0.1);
+  color: #2ecc71;
+}
+
+.stat-icon-wrapper.warning {
+  background-color: rgba(241, 196, 15, 0.1);
+  color: #f1c40f;
+}
+
+.stat-icon-wrapper.info {
+  background-color: rgba(52, 152, 219, 0.1);
+  color: #3498db;
+}
+
+.stat-content h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin: 0;
+}
+
+.stat-content h6 {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.appointments-card {
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.appointment-item {
+  transition: background-color 0.2s ease;
+}
+
+.appointment-item:hover {
+  background-color: #f8f9fa;
+}
+
+.appointment-item:last-child {
+  border-bottom: none !important;
+}
+
+.appointment-time {
+  min-width: 100px;
+}
+
+.customer-info h6 {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #2c3e50;
+}
+
+.phone-link {
+  font-size: 0.875rem;
+}
+
+.service-info {
+  min-width: 150px;
+}
+
+.service-name {
+  font-size: 0.9rem;
+  color: #2c3e50;
+}
+
+.service-price {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.status-badge {
+  min-width: 120px;
+  justify-content: center;
+}
+
+.no-appointments {
+  background-color: #f8f9fa;
+  border-radius: 0 0 10px 10px;
+}
+
+.phone-link:hover {
+  color: #0d6efd !important;
+}
+
+@media (max-width: 768px) {
+  .dashboard-container {
+    padding: 1rem !important;
+  }
+
+  .dashboard-header {
+    padding: 1rem;
+  }
+
+  .stat-card {
+    margin-bottom: 1rem;
+  }
+
+  .appointment-item {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .appointment-time {
+    min-width: auto;
+  }
+
+  .service-info {
+    min-width: auto;
+    text-align: left !important;
+  }
+
+  .status-badge {
+    min-width: auto;
+  }
+} 

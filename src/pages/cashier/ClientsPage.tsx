@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
-import { Container, Card, Form, InputGroup, Button, Table, Badge, Modal, Row, Col } from 'react-bootstrap';
-import { FaSearch, FaUserPlus, FaEdit, FaWhatsapp, FaTrash, FaEye, FaHistory } from 'react-icons/fa';
-import StaffLayout from '../../components/staff/layout/StaffLayout';
+import React, { useState, useEffect } from 'react';
+import { Container, Card, Row, Col, Form, Table, Button, Badge, Modal, Spinner } from 'react-bootstrap';
+import { FaUserPlus, FaSearch, FaEdit, FaTrash, FaHistory } from 'react-icons/fa';
+import { toast } from 'react-toastify';
+import CashierLayout from '../../components/cashier/layout/CashierLayout';
+import { format } from 'date-fns';
+import { es } from 'date-fns/locale';
 
 interface Client {
   id: number;
@@ -11,9 +14,10 @@ interface Client {
   phone: string;
   email: string;
   address: string;
-  status: 'active' | 'inactive';
+  status: 'active' | 'inactive' | 'pending';
   createdAt: string;
   lastVisit?: string;
+  notes?: string;
 }
 
 interface Visit {
@@ -25,265 +29,285 @@ interface Visit {
   status: 'completed' | 'cancelled';
 }
 
+// Mock service for now
+const clientService = {
+  getClients: async (params: any) => {
+    // Mock implementation
+    return [];
+  },
+  createClient: async (client: Client) => {
+    // Mock implementation
+    return client;
+  },
+  updateClient: async (id: number, client: Partial<Client>) => {
+    // Mock implementation
+    return client;
+  },
+  deleteClient: async (id: number) => {
+    // Mock implementation
+    return true;
+  }
+};
+
 const ClientsPage = () => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [showClientModal, setShowClientModal] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [clients, setClients] = useState<Client[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showNewClientModal, setShowNewClientModal] = useState(false);
   const [showHistoryModal, setShowHistoryModal] = useState(false);
-  const [editingClient, setEditingClient] = useState<Client | null>(null);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterStatus, setFilterStatus] = useState('all');
+  const [sortBy, setSortBy] = useState('name');
+  const [formData, setFormData] = useState<Partial<Client>>({});
 
-  // Mock data
-  const mockClients: Client[] = [
-    {
-      id: 1,
-      document: '123456789',
-      name: 'Ana',
-      lastName: 'Martínez',
-      phone: '300-123-4567',
-      email: 'ana@example.com',
-      address: 'Calle 123 #45-67',
-      status: 'active',
-      createdAt: '2024-01-15',
-      lastVisit: '2024-02-20'
-    },
-    {
-      id: 2,
-      document: '987654321',
-      name: 'María',
-      lastName: 'González',
-      phone: '301-234-5678',
-      email: 'maria@example.com',
-      address: 'Carrera 89 #12-34',
-      status: 'active',
-      createdAt: '2024-01-20',
-      lastVisit: '2024-02-18'
+  useEffect(() => {
+    fetchClients();
+  }, []);
+
+  const fetchClients = async () => {
+    try {
+      setLoading(true);
+      const data = await clientService.getClients({
+        search: searchTerm,
+        status: filterStatus,
+        sortBy
+      });
+      setClients(data);
+    } catch (error) {
+      console.error('Error fetching clients:', error);
+      toast.error('Error al cargar los clientes');
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
 
-  const mockVisits: Visit[] = [
-    {
-      id: 1,
-      date: '2024-02-20',
-      service: 'Manicure y Pedicure',
-      professional: 'Laura Pérez',
-      price: 45000,
-      status: 'completed'
-    },
-    {
-      id: 2,
-      date: '2024-02-18',
-      service: 'Corte de Cabello',
-      professional: 'Carlos Rodríguez',
-      price: 35000,
-      status: 'completed'
+  const handleDeleteClient = async (id: number) => {
+    if (window.confirm('¿Está seguro de que desea eliminar este cliente?')) {
+      try {
+        await clientService.deleteClient(id);
+        toast.success('Cliente eliminado exitosamente');
+        fetchClients();
+      } catch (error) {
+        console.error('Error deleting client:', error);
+        toast.error('Error al eliminar el cliente');
+      }
     }
-  ];
+  };
 
-  const handleSearch = (e: React.FormEvent) => {
+  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Implement search logic
+    try {
+      if (selectedClient) {
+        await clientService.updateClient(selectedClient.id, formData);
+        toast.success('Cliente actualizado exitosamente');
+      } else {
+        await clientService.createClient(formData as Client);
+        toast.success('Cliente creado exitosamente');
+      }
+      setShowNewClientModal(false);
+      setFormData({});
+      setSelectedClient(null);
+      fetchClients();
+    } catch (error) {
+      console.error('Error saving client:', error);
+      toast.error('Error al guardar el cliente');
+    }
   };
 
-  const handleWhatsApp = (phone: string) => {
-    window.open(`https://wa.me/${phone.replace(/\D/g, '')}`, '_blank');
+  const handleFilter = () => {
+    fetchClients();
   };
 
-  const handleEditClient = (client: Client) => {
-    setEditingClient(client);
-    setShowClientModal(true);
-  };
-
-  const handleDeleteClient = (client: Client) => {
-    setSelectedClient(client);
-    setShowDeleteModal(true);
-  };
-
-  const handleViewHistory = (client: Client) => {
-    setSelectedClient(client);
-    setShowHistoryModal(true);
-  };
-
-  const handleSaveClient = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Implement save logic
-    setShowClientModal(false);
-    setEditingClient(null);
-  };
-
-  const handleConfirmDelete = () => {
-    // Implement delete logic
-    setShowDeleteModal(false);
-    setSelectedClient(null);
+  const getStatusBadgeVariant = (status: string) => {
+    const variants = {
+      active: 'success',
+      inactive: 'danger',
+      pending: 'warning'
+    };
+    return variants[status as keyof typeof variants] || 'secondary';
   };
 
   return (
-    <StaffLayout role="cashier">
-      <div className="page-header">
-        <Container fluid>
-          <Row className="align-items-center">
-            <Col>
-              <h1 className="mb-0">Gestión de Clientes</h1>
-            </Col>
-            <Col xs="auto">
-              <Button variant="primary" onClick={() => setShowClientModal(true)}>
-                <FaUserPlus className="me-2" />
-                Nuevo Cliente
-              </Button>
-            </Col>
-          </Row>
-        </Container>
-      </div>
-
-      <Container fluid>
-        <div className="content-wrapper">
-          <div className="search-bar">
-            <Form onSubmit={handleSearch}>
-              <InputGroup>
-                <Form.Control
-                  placeholder="Buscar por documento o nombre..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-                <Button type="submit" variant="primary">
-                  <FaSearch /> Buscar
-                </Button>
-              </InputGroup>
-            </Form>
-          </div>
-
-          <div className="table-container">
-            <Table responsive hover className="mb-0">
-              <thead>
-                <tr>
-                  <th>Documento</th>
-                  <th>Nombre Completo</th>
-                  <th>Teléfono</th>
-                  <th>Email</th>
-                  <th>Última Visita</th>
-                  <th className="text-center">Estado</th>
-                  <th className="text-end">Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                {mockClients.map((client) => (
-                  <tr key={client.id}>
-                    <td>{client.document}</td>
-                    <td>{`${client.name} ${client.lastName}`}</td>
-                    <td>{client.phone}</td>
-                    <td>{client.email}</td>
-                    <td>{client.lastVisit || 'Sin visitas'}</td>
-                    <td className="text-center">
-                      <Badge 
-                        bg={client.status === 'active' ? 'success' : 'secondary'}
-                        className="status-badge"
-                      >
-                        {client.status === 'active' ? 'Activo' : 'Inactivo'}
-                      </Badge>
-                    </td>
-                    <td>
-                      <div className="action-buttons">
-                        <Button
-                          variant="success"
-                          size="sm"
-                          className="action-button"
-                          onClick={() => handleWhatsApp(client.phone)}
-                          title="WhatsApp"
-                        >
-                          <FaWhatsapp />
-                        </Button>
-                        <Button
-                          variant="info"
-                          size="sm"
-                          className="action-button"
-                          onClick={() => handleViewHistory(client)}
-                          title="Ver Historial"
-                        >
-                          <FaHistory />
-                        </Button>
-                        <Button
-                          variant="primary"
-                          size="sm"
-                          className="action-button"
-                          onClick={() => handleEditClient(client)}
-                          title="Editar"
-                        >
-                          <FaEdit />
-                        </Button>
-                        <Button
-                          variant="danger"
-                          size="sm"
-                          className="action-button"
-                          onClick={() => handleDeleteClient(client)}
-                          title="Eliminar"
-                        >
-                          <FaTrash />
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </Table>
-          </div>
+    <CashierLayout>
+      <Container fluid className="dashboard-container px-4 py-4">
+        <div className="dashboard-header mb-4">
+          <h2 className="mb-1">Gestión de Clientes</h2>
+          <p className="text-muted mb-0">
+            {format(new Date(), "EEEE, d 'de' MMMM", { locale: es })}
+          </p>
         </div>
 
-        {/* Client Modal */}
-        <Modal 
-          show={showClientModal} 
-          onHide={() => {
-            setShowClientModal(false);
-            setEditingClient(null);
-          }}
-          size="lg"
-        >
+        {/* Filtros */}
+        <Card className="mb-4 border-0 shadow-sm">
+          <Card.Body>
+            <Row>
+              <Col md={4} className="mb-3">
+                <Form.Group>
+                  <Form.Label>Buscar Cliente</Form.Label>
+                  <Form.Control
+                    type="text"
+                    placeholder="Nombre, teléfono o email..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                </Form.Group>
+              </Col>
+              <Col md={3} className="mb-3">
+                <Form.Group>
+                  <Form.Label>Estado</Form.Label>
+                  <Form.Select
+                    value={filterStatus}
+                    onChange={(e) => setFilterStatus(e.target.value)}
+                  >
+                    <option value="all">Todos los estados</option>
+                    <option value="active">Activo</option>
+                    <option value="inactive">Inactivo</option>
+                    <option value="pending">Pendiente</option>
+                  </Form.Select>
+                </Form.Group>
+              </Col>
+              <Col md={2} className="mb-3 d-flex align-items-end">
+                <Button variant="primary" onClick={handleFilter} className="w-100">
+                  <FaSearch className="me-2" />
+                  Filtrar
+                </Button>
+              </Col>
+            </Row>
+          </Card.Body>
+        </Card>
+
+        {/* Lista de Clientes */}
+        <Card className="border-0 shadow-sm">
+          <Card.Header className="bg-white d-flex justify-content-between align-items-center py-3">
+            <h5 className="mb-0 text-dark fw-bold">Lista de Clientes</h5>
+            <Button variant="primary" className="btn-correjir" onClick={() => setShowNewClientModal(true)}>
+              <FaUserPlus className="me-2" />Nuevo Cliente
+            </Button>
+          </Card.Header>
+          <Card.Body className="p-0">
+            {loading ? (
+              <div className="text-center p-5">
+                <Spinner animation="border" role="status">
+                  <span className="visually-hidden">Cargando...</span>
+                </Spinner>
+              </div>
+            ) : (
+              <Table responsive hover className="mb-0">
+                <thead>
+                  <tr>
+                    <th>Nombre</th>
+                    <th>Contacto</th>
+                    <th>Fecha de Registro</th>
+                    <th>Última Visita</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {clients.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="text-center py-4">
+                        No se encontraron clientes
+                      </td>
+                    </tr>
+                  ) : (
+                    clients.map(client => (
+                      <tr key={client.id}>
+                        <td>
+                          <div>{client.name}</div>
+                          <small className="text-muted">ID: {client.id}</small>
+                        </td>
+                        <td>
+                          <div>{client.email}</div>
+                          <small className="text-muted">{client.phone}</small>
+                        </td>
+                        <td>{new Date(client.createdAt).toLocaleDateString()}</td>
+                        <td>{client.lastVisit ? new Date(client.lastVisit).toLocaleDateString() : 'Nunca'}</td>
+                        <td>
+                          <Badge bg={getStatusBadgeVariant(client.status)}>
+                            {client.status.charAt(0).toUpperCase() + client.status.slice(1)}
+                          </Badge>
+                        </td>
+                        <td>
+                          <Button
+                            variant="outline-secondary"
+                            size="sm"
+                            className="me-1"
+                            onClick={() => {
+                              setSelectedClient(client);
+                              setFormData(client);
+                              setShowNewClientModal(true);
+                            }}
+                          >
+                            <FaEdit />
+                          </Button>
+                          <Button
+                            variant="outline-primary"
+                            size="sm"
+                            className="me-1"
+                            onClick={() => {
+                              setSelectedClient(client);
+                              setShowHistoryModal(true);
+                            }}
+                          >
+                            <FaHistory />
+                          </Button>
+                          <Button
+                            variant="outline-danger"
+                            size="sm"
+                            onClick={() => handleDeleteClient(client.id)}
+                          >
+                            <FaTrash />
+                          </Button>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </Table>
+            )}
+          </Card.Body>
+        </Card>
+
+        {/* Modal de Nuevo/Editar Cliente */}
+        <Modal show={showNewClientModal} onHide={() => setShowNewClientModal(false)} size="lg">
           <Modal.Header closeButton>
             <Modal.Title>
-              {editingClient ? 'Editar Cliente' : 'Nuevo Cliente'}
+              {selectedClient ? 'Editar Cliente' : 'Nuevo Cliente'}
             </Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            <Form onSubmit={handleSaveClient}>
+            <Form onSubmit={handleSubmit}>
               <Row>
                 <Col md={6}>
                   <Form.Group className="mb-3">
-                    <Form.Label>Documento</Form.Label>
+                    <Form.Label>Nombre</Form.Label>
                     <Form.Control
                       type="text"
+                      name="name"
+                      value={formData.name || ''}
+                      onChange={handleFormChange}
                       required
-                      defaultValue={editingClient?.document}
                     />
                   </Form.Group>
                 </Col>
                 <Col md={6}>
                   <Form.Group className="mb-3">
-                    <Form.Label>Teléfono</Form.Label>
-                    <Form.Control
-                      type="tel"
-                      required
-                      defaultValue={editingClient?.phone}
-                    />
-                  </Form.Group>
-                </Col>
-              </Row>
-              <Row>
-                <Col md={6}>
-                  <Form.Group className="mb-3">
-                    <Form.Label>Nombres</Form.Label>
+                    <Form.Label>Apellido</Form.Label>
                     <Form.Control
                       type="text"
+                      name="lastName"
+                      value={formData.lastName || ''}
+                      onChange={handleFormChange}
                       required
-                      defaultValue={editingClient?.name}
-                    />
-                  </Form.Group>
-                </Col>
-                <Col md={6}>
-                  <Form.Group className="mb-3">
-                    <Form.Label>Apellidos</Form.Label>
-                    <Form.Control
-                      type="text"
-                      required
-                      defaultValue={editingClient?.lastName}
                     />
                   </Form.Group>
                 </Col>
@@ -294,16 +318,51 @@ const ClientsPage = () => {
                     <Form.Label>Email</Form.Label>
                     <Form.Control
                       type="email"
-                      defaultValue={editingClient?.email}
+                      name="email"
+                      value={formData.email || ''}
+                      onChange={handleFormChange}
+                      required
+                    />
+                  </Form.Group>
+                </Col>
+                <Col md={6}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Teléfono</Form.Label>
+                    <Form.Control
+                      type="tel"
+                      name="phone"
+                      value={formData.phone || ''}
+                      onChange={handleFormChange}
+                      required
+                    />
+                  </Form.Group>
+                </Col>
+              </Row>
+              <Row>
+                <Col md={6}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Documento</Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="document"
+                      value={formData.document || ''}
+                      onChange={handleFormChange}
+                      required
                     />
                   </Form.Group>
                 </Col>
                 <Col md={6}>
                   <Form.Group className="mb-3">
                     <Form.Label>Estado</Form.Label>
-                    <Form.Select defaultValue={editingClient?.status || 'active'}>
+                    <Form.Select
+                      name="status"
+                      value={formData.status || 'active'}
+                      onChange={handleFormChange}
+                      required
+                    >
                       <option value="active">Activo</option>
                       <option value="inactive">Inactivo</option>
+                      <option value="pending">Pendiente</option>
                     </Form.Select>
                   </Form.Group>
                 </Col>
@@ -311,106 +370,87 @@ const ClientsPage = () => {
               <Form.Group className="mb-3">
                 <Form.Label>Dirección</Form.Label>
                 <Form.Control
-                  type="text"
-                  defaultValue={editingClient?.address}
+                  as="textarea"
+                  rows={3}
+                  name="address"
+                  value={formData.address || ''}
+                  onChange={handleFormChange}
                 />
               </Form.Group>
-              <div className="d-flex justify-content-end gap-2">
-                <Button variant="secondary" onClick={() => {
-                  setShowClientModal(false);
-                  setEditingClient(null);
-                }}>
-                  Cancelar
-                </Button>
-                <Button variant="primary" type="submit">
-                  {editingClient ? 'Guardar Cambios' : 'Crear Cliente'}
-                </Button>
-              </div>
+              <Form.Group className="mb-3">
+                <Form.Label>Notas</Form.Label>
+                <Form.Control
+                  as="textarea"
+                  rows={3}
+                  name="notes"
+                  value={formData.notes || ''}
+                  onChange={handleFormChange}
+                />
+              </Form.Group>
             </Form>
           </Modal.Body>
-        </Modal>
-
-        {/* Delete Confirmation Modal */}
-        <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
-          <Modal.Header closeButton>
-            <Modal.Title>Confirmar Eliminación</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <p>¿Está seguro que desea eliminar al cliente {selectedClient?.name} {selectedClient?.lastName}?</p>
-            <p className="text-danger mb-0">Esta acción no se puede deshacer.</p>
-          </Modal.Body>
           <Modal.Footer>
-            <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
+            <Button variant="secondary" onClick={() => setShowNewClientModal(false)}>
               Cancelar
             </Button>
-            <Button variant="danger" onClick={handleConfirmDelete}>
-              Eliminar Cliente
+            <Button variant="primary" onClick={handleSubmit}>
+              {selectedClient ? 'Actualizar' : 'Crear'}
             </Button>
           </Modal.Footer>
         </Modal>
 
-        {/* History Modal */}
-        <Modal 
-          show={showHistoryModal} 
-          onHide={() => setShowHistoryModal(false)}
-          size="lg"
-        >
+        {/* Modal de Historial */}
+        <Modal show={showHistoryModal} onHide={() => setShowHistoryModal(false)} size="lg">
           <Modal.Header closeButton>
-            <Modal.Title>
-              Historial de Visitas - {selectedClient?.name} {selectedClient?.lastName}
-            </Modal.Title>
+            <Modal.Title>Historial del Cliente</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            <div className="client-info mb-4">
-              <h6 className="mb-3">Información del Cliente</h6>
-              <Row>
-                <Col md={6}>
-                  <p><strong>Documento:</strong> {selectedClient?.document}</p>
-                  <p><strong>Teléfono:</strong> {selectedClient?.phone}</p>
-                  <p><strong>Email:</strong> {selectedClient?.email}</p>
-                </Col>
-                <Col md={6}>
-                  <p><strong>Dirección:</strong> {selectedClient?.address}</p>
-                  <p><strong>Cliente desde:</strong> {selectedClient?.createdAt}</p>
-                  <p><strong>Última visita:</strong> {selectedClient?.lastVisit || 'Sin visitas'}</p>
-                </Col>
-              </Row>
-            </div>
-
-            <h6 className="mb-3">Historial de Servicios</h6>
-            <Table responsive hover>
-              <thead>
-                <tr>
-                  <th>Fecha</th>
-                  <th>Servicio</th>
-                  <th>Profesional</th>
-                  <th>Precio</th>
-                  <th className="text-center">Estado</th>
-                </tr>
-              </thead>
-              <tbody>
-                {mockVisits.map((visit) => (
-                  <tr key={visit.id}>
-                    <td>{visit.date}</td>
-                    <td>{visit.service}</td>
-                    <td>{visit.professional}</td>
-                    <td>${visit.price.toLocaleString()}</td>
-                    <td className="text-center">
-                      <Badge 
-                        bg={visit.status === 'completed' ? 'success' : 'danger'}
-                        className="status-badge"
-                      >
-                        {visit.status === 'completed' ? 'Completado' : 'Cancelado'}
-                      </Badge>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </Table>
+            {selectedClient && (
+              <>
+                <div className="mb-4">
+                  <h5>{selectedClient.name}</h5>
+                  <p className="text-muted mb-0">
+                    Cliente desde {new Date(selectedClient.createdAt).toLocaleDateString()}
+                  </p>
+                </div>
+                <div className="mb-4">
+                  <h6>Últimas Visitas</h6>
+                  <Table responsive>
+                    <thead>
+                      <tr>
+                        <th>Fecha</th>
+                        <th>Servicio</th>
+                        <th>Profesional</th>
+                        <th>Total</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>15/03/2024</td>
+                        <td>Tratamiento Facial Premium</td>
+                        <td>Dra. Laura Martínez</td>
+                        <td>$180,000</td>
+                      </tr>
+                      <tr>
+                        <td>01/03/2024</td>
+                        <td>Depilación Láser</td>
+                        <td>Est. Sofía Rodríguez</td>
+                        <td>$250,000</td>
+                      </tr>
+                    </tbody>
+                  </Table>
+                </div>
+              </>
+            )}
           </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={() => setShowHistoryModal(false)}>
+              Cerrar
+            </Button>
+          </Modal.Footer>
         </Modal>
       </Container>
-    </StaffLayout>
+    </CashierLayout>
   );
 };
 

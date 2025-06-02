@@ -1,19 +1,37 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Card, Row, Col, Form, Table, Button, Badge, Modal, Spinner } from 'react-bootstrap';
-import { FaCalendarPlus, FaSearch, FaEdit, FaTimes, FaCheck, FaWhatsapp } from 'react-icons/fa';
-import { toast } from 'react-toastify';
-import appointmentService, { Appointment, CreateAppointmentDto } from '../../services/appointmentService';
+import { Container, Row, Col, Card, Button, Table, Badge, Modal, Form } from 'react-bootstrap';
+import { FaCalendarAlt, FaClock, FaUser, FaPhone, FaEdit, FaTrash, FaCheck, FaTimes, FaSearch, FaFilter } from 'react-icons/fa';
+import { format } from 'date-fns';
+import { es } from 'date-fns/locale';
+import CashierLayout from '../../components/cashier/layout/CashierLayout';
+import './CashierPages.css';
+
+interface Appointment {
+  id: number;
+  clientName: string;
+  service: string;
+  date: string;
+  time: string;
+  status: 'pending' | 'confirmed' | 'cancelled' | 'completed';
+  phone: string;
+}
 
 const AppointmentsPage: React.FC = () => {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
   const [showNewAppointmentModal, setShowNewAppointmentModal] = useState(false);
-  const [showReminderModal, setShowReminderModal] = useState(false);
+  const [showEditAppointmentModal, setShowEditAppointmentModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
-  const [filterDate, setFilterDate] = useState('');
-  const [filterStatus, setFilterStatus] = useState('all');
-  const [filterProfessional, setFilterProfessional] = useState('all');
-  const [formData, setFormData] = useState<Partial<CreateAppointmentDto>>({});
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterStatus, setFilterStatus] = useState<string>('all');
+  const [formData, setFormData] = useState({
+    clientName: '',
+    service: '',
+    date: '',
+    time: '',
+    phone: ''
+  });
 
   useEffect(() => {
     fetchAppointments();
@@ -22,66 +40,42 @@ const AppointmentsPage: React.FC = () => {
   const fetchAppointments = async () => {
     try {
       setLoading(true);
-      const data = await appointmentService.getAppointments({
-        date: filterDate,
-        status: filterStatus,
-        professionalId: filterProfessional
-      });
-      setAppointments(data);
+      // Simulación de llamada a API
+      const mockAppointments: Appointment[] = [
+        {
+          id: 1,
+          clientName: 'María González',
+          service: 'Corte y Color',
+          date: '2024-02-20',
+          time: '10:00',
+          status: 'confirmed',
+          phone: '300-123-4567'
+        },
+        {
+          id: 2,
+          clientName: 'Juan Pérez',
+          service: 'Manicure',
+          date: '2024-02-20',
+          time: '11:30',
+          status: 'pending',
+          phone: '300-234-5678'
+        },
+        {
+          id: 3,
+          clientName: 'Ana Martínez',
+          service: 'Pedicure',
+          date: '2024-02-20',
+          time: '14:00',
+          status: 'cancelled',
+          phone: '300-345-6789'
+        }
+      ];
+      setAppointments(mockAppointments);
     } catch (error) {
       console.error('Error fetching appointments:', error);
-      toast.error('Error al cargar las citas');
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleConfirmAppointment = async (id: number) => {
-    try {
-      await appointmentService.updateAppointment(id, { status: 'confirmed' });
-      toast.success('Cita confirmada exitosamente');
-      fetchAppointments();
-    } catch (error) {
-      console.error('Error confirming appointment:', error);
-      toast.error('Error al confirmar la cita');
-    }
-  };
-
-  const handleCancelAppointment = async (id: number) => {
-    if (window.confirm('¿Está seguro de que desea cancelar esta cita?')) {
-      try {
-        await appointmentService.updateAppointment(id, { status: 'canceled' });
-        toast.success('Cita cancelada exitosamente');
-        fetchAppointments();
-      } catch (error) {
-        console.error('Error canceling appointment:', error);
-        toast.error('Error al cancelar la cita');
-      }
-    }
-  };
-
-  const handleSendReminder = (appointment: Appointment) => {
-    setSelectedAppointment(appointment);
-    setShowReminderModal(true);
-  };
-
-  const handleConfirmSendReminder = () => {
-    if (!selectedAppointment) return;
-
-    const message = `Hola ${selectedAppointment.customer.name.split(' ')[0]}, este es un recordatorio de tu cita en MAOR Centro de Belleza.
-📅 Fecha: ${new Date(selectedAppointment.date).toLocaleDateString('es-ES')}
-⏰ Hora: ${selectedAppointment.time}
-💆 Servicio: ${selectedAppointment.service.name}
-👩‍⚕️ Profesional: ${selectedAppointment.professional.name}
-
-📍 Ubicación: Carrera 25 #15-30, Sincelejo
-📞 Teléfono: (605) 287 6543
-
-Gracias por confiar en MAOR Centro de Belleza.`;
-
-    const whatsappUrl = `https://wa.me/57${selectedAppointment.customer.phone.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, '_blank');
-    setShowReminderModal(false);
   };
 
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -95,232 +89,308 @@ Gracias por confiar en MAOR Centro de Belleza.`;
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await appointmentService.createAppointment(formData as CreateAppointmentDto);
-      toast.success('Cita creada exitosamente');
+      if (selectedAppointment) {
+        // Lógica para actualizar cita
+        console.log('Actualizando cita:', { ...formData, id: selectedAppointment.id });
+      } else {
+        // Lógica para crear nueva cita
+        console.log('Creando nueva cita:', formData);
+      }
       setShowNewAppointmentModal(false);
-      setFormData({});
+      setShowEditAppointmentModal(false);
+      setFormData({
+        clientName: '',
+        service: '',
+        date: '',
+        time: '',
+        phone: ''
+      });
       fetchAppointments();
     } catch (error) {
-      console.error('Error creating appointment:', error);
-      toast.error('Error al crear la cita');
+      console.error('Error saving appointment:', error);
     }
   };
 
-  const handleFilter = () => {
-    fetchAppointments();
+  const handleDelete = async () => {
+    if (!selectedAppointment) return;
+    try {
+      // Lógica para eliminar cita
+      console.log('Eliminando cita:', selectedAppointment.id);
+      setShowDeleteModal(false);
+      fetchAppointments();
+    } catch (error) {
+      console.error('Error deleting appointment:', error);
+    }
   };
 
   const getStatusBadgeVariant = (status: string) => {
-    const variants = {
-      pending: 'warning',
-      confirmed: 'success',
-      completed: 'primary',
-      canceled: 'danger'
-    };
-    return variants[status as keyof typeof variants] || 'secondary';
+    switch (status) {
+      case 'confirmed':
+        return 'success';
+      case 'pending':
+        return 'warning';
+      case 'cancelled':
+        return 'danger';
+      case 'completed':
+        return 'info';
+      default:
+        return 'secondary';
+    }
   };
 
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case 'confirmed':
+        return 'Confirmada';
+      case 'pending':
+        return 'Pendiente';
+      case 'cancelled':
+        return 'Cancelada';
+      case 'completed':
+        return 'Completada';
+      default:
+        return status;
+    }
+  };
+
+  const filteredAppointments = appointments.filter(appointment => {
+    const matchesSearch = appointment.clientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         appointment.service.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = filterStatus === 'all' || appointment.status === filterStatus;
+    return matchesSearch && matchesStatus;
+  });
+
   return (
-    <Container fluid className="py-4">
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <h2><FaCalendarPlus className="me-2" />Gestión de Citas</h2>
-        <Button variant="primary" onClick={() => setShowNewAppointmentModal(true)}>
-          <FaCalendarPlus className="me-2" />Nueva Cita
-        </Button>
+    <CashierLayout>
+      <div className="cashier-content d-flex justify-content-center">
+        <div className="content-wrapper" style={{ maxWidth: '1200px', width: '100%' }}>
+          <div className="content-header">
+            <div className="header-content">
+              <h1>Gestión de Citas</h1>
+              <p className="text-muted">
+                {format(new Date(), "EEEE, d 'de' MMMM", { locale: es })}
+              </p>
+            </div>
+            <Button 
+              variant="primary" 
+              className="btn-correjir"
+              onClick={() => {
+                setSelectedAppointment(null);
+                setFormData({
+                  clientName: '',
+                  service: '',
+                  date: '',
+                  time: '',
+                  phone: ''
+                });
+                setShowNewAppointmentModal(true);
+              }}
+            >
+              <FaCalendarAlt className="me-2" />
+              Nueva Cita
+            </Button>
+          </div>
+
+          <div className="content-body">
+            <Card className="border-0 shadow-sm mb-4">
+              <Card.Body>
+                <Row className="g-3">
+                  <Col md={6}>
+                    <div className="search-box">
+                      <FaSearch className="search-icon" />
+                      <Form.Control
+                        type="text"
+                        placeholder="Buscar por cliente o servicio..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="form-control-lg"
+                      />
+                    </div>
+                  </Col>
+                  <Col md={6}>
+                    <div className="filter-box">
+                      <FaFilter className="filter-icon" />
+                      <Form.Select
+                        value={filterStatus}
+                        onChange={(e) => setFilterStatus(e.target.value)}
+                        className="form-control-lg"
+                      >
+                        <option value="all">Todos los estados</option>
+                        <option value="pending">Pendientes</option>
+                        <option value="confirmed">Confirmadas</option>
+                        <option value="cancelled">Canceladas</option>
+                        <option value="completed">Completadas</option>
+                      </Form.Select>
+                    </div>
+                  </Col>
+                </Row>
+              </Card.Body>
+            </Card>
+
+            <Card className="border-0 shadow-sm">
+              <Card.Body className="p-0">
+                <div className="table-responsive">
+                  <Table hover className="mb-0">
+                    <thead>
+                      <tr>
+                        <th className="px-4">Cliente</th>
+                        <th>Servicio</th>
+                        <th>Fecha</th>
+                        <th>Hora</th>
+                        <th>Teléfono</th>
+                        <th>Estado</th>
+                        <th className="text-end px-4">Acciones</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {loading ? (
+                        <tr>
+                          <td colSpan={7} className="text-center py-4">
+                            <div className="loading-spinner">
+                              <div className="spinner-border text-primary" role="status">
+                                <span className="visually-hidden">Cargando...</span>
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                      ) : filteredAppointments.length === 0 ? (
+                        <tr>
+                          <td colSpan={7} className="text-center py-4">
+                            <div className="no-data-message">
+                              <FaCalendarAlt className="mb-3" style={{ fontSize: '2rem', color: '#9b59b6' }} />
+                              <p>No se encontraron citas</p>
+                            </div>
+                          </td>
+                        </tr>
+                      ) : (
+                        filteredAppointments.map((appointment) => (
+                          <tr key={appointment.id}>
+                            <td className="px-4">
+                              <div className="d-flex align-items-center">
+                                <div className="client-avatar">
+                                  <FaUser />
+                                </div>
+                                <div className="ms-3">
+                                  <div className="client-name">{appointment.clientName}</div>
+                                  <div className="client-phone text-muted">
+                                    <FaPhone className="me-1" />
+                                    {appointment.phone}
+                                  </div>
+                                </div>
+                              </div>
+                            </td>
+                            <td>
+                              <div className="service-name">{appointment.service}</div>
+                            </td>
+                            <td>
+                              <div className="date-info">
+                                <FaCalendarAlt className="me-2 text-muted" />
+                                {format(new Date(appointment.date), 'dd/MM/yyyy')}
+                              </div>
+                            </td>
+                            <td>
+                              <div className="time-info">
+                                <FaClock className="me-2 text-muted" />
+                                {appointment.time}
+                              </div>
+                            </td>
+                            <td>
+                              <div className="phone-info">
+                                <FaPhone className="me-2 text-muted" />
+                                {appointment.phone}
+                              </div>
+                            </td>
+                            <td>
+                              <Badge bg={getStatusBadgeVariant(appointment.status)} className="status-badge">
+                                {getStatusText(appointment.status)}
+                              </Badge>
+                            </td>
+                            <td className="text-end px-4">
+                              <div className="action-buttons">
+                                <Button
+                                  variant="link"
+                                  className="text-primary p-0 me-3"
+                                  onClick={() => {
+                                    setSelectedAppointment(appointment);
+                                    setFormData({
+                                      clientName: appointment.clientName,
+                                      service: appointment.service,
+                                      date: appointment.date,
+                                      time: appointment.time,
+                                      phone: appointment.phone
+                                    });
+                                    setShowEditAppointmentModal(true);
+                                  }}
+                                >
+                                  <FaEdit />
+                                </Button>
+                                <Button
+                                  variant="link"
+                                  className="text-danger p-0"
+                                  onClick={() => {
+                                    setSelectedAppointment(appointment);
+                                    setShowDeleteModal(true);
+                                  }}
+                                >
+                                  <FaTrash />
+                                </Button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </Table>
+                </div>
+              </Card.Body>
+            </Card>
+          </div>
+        </div>
       </div>
 
-      {/* Filtros */}
-      <Card className="mb-4">
-        <Card.Body>
-          <Row>
-            <Col md={3} className="mb-3">
-              <Form.Group>
-                <Form.Label>Fecha</Form.Label>
-                <Form.Control
-                  type="date"
-                  value={filterDate}
-                  onChange={(e) => setFilterDate(e.target.value)}
-                />
-              </Form.Group>
-            </Col>
-            <Col md={3} className="mb-3">
-              <Form.Group>
-                <Form.Label>Estado</Form.Label>
-                <Form.Select
-                  value={filterStatus}
-                  onChange={(e) => setFilterStatus(e.target.value)}
-                >
-                  <option value="all">Todos los estados</option>
-                  <option value="pending">Pendiente</option>
-                  <option value="confirmed">Confirmada</option>
-                  <option value="completed">Completada</option>
-                  <option value="canceled">Cancelada</option>
-                </Form.Select>
-              </Form.Group>
-            </Col>
-            <Col md={3} className="mb-3">
-              <Form.Group>
-                <Form.Label>Profesional</Form.Label>
-                <Form.Select
-                  value={filterProfessional}
-                  onChange={(e) => setFilterProfessional(e.target.value)}
-                >
-                  <option value="all">Todos los profesionales</option>
-                  <option value="1">Dra. Laura Martínez</option>
-                  <option value="2">Est. Sofía Rodríguez</option>
-                  <option value="3">Lic. Carolina Gómez</option>
-                </Form.Select>
-              </Form.Group>
-            </Col>
-            <Col md={3} className="d-flex align-items-end">
-              <Button variant="primary" className="w-100" onClick={handleFilter}>
-                <FaSearch className="me-2" />Filtrar
-              </Button>
-            </Col>
-          </Row>
-        </Card.Body>
-      </Card>
-
-      {/* Listado de Citas */}
-      <Card>
-        <Card.Header className="bg-white d-flex justify-content-between align-items-center">
-          <h4 className="mb-0">Próximas Citas</h4>
-          <div>
-            <Badge bg="primary" className="me-2">{appointments.length} citas</Badge>
-            <Badge bg="warning">{appointments.filter(apt => apt.status === 'pending').length} pendientes</Badge>
-          </div>
-        </Card.Header>
-        <Card.Body className="p-0">
-          {loading ? (
-            <div className="text-center p-5">
-              <Spinner animation="border" role="status">
-                <span className="visually-hidden">Cargando...</span>
-              </Spinner>
-            </div>
-          ) : (
-            <Table responsive hover className="mb-0">
-              <thead>
-                <tr>
-                  <th>Fecha</th>
-                  <th>Hora</th>
-                  <th>Cliente</th>
-                  <th>Servicio</th>
-                  <th>Profesional</th>
-                  <th>Estado</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                {appointments.length === 0 ? (
-                  <tr>
-                    <td colSpan={7} className="text-center py-4">
-                      No se encontraron citas
-                    </td>
-                  </tr>
-                ) : (
-                  appointments.map(appointment => (
-                    <tr key={appointment.id}>
-                      <td>{new Date(appointment.date).toLocaleDateString()}</td>
-                      <td>{appointment.time}</td>
-                      <td>
-                        <div>{appointment.customer.name}</div>
-                        <small className="text-muted">{appointment.customer.phone}</small>
-                      </td>
-                      <td>
-                        <div>{appointment.service.name}</div>
-                        <small className="text-muted">${appointment.service.price.toLocaleString()}</small>
-                      </td>
-                      <td>{appointment.professional.name}</td>
-                      <td>
-                        <Badge bg={getStatusBadgeVariant(appointment.status)}>
-                          {appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1)}
-                        </Badge>
-                      </td>
-                      <td>
-                        <Button
-                          variant="outline-secondary"
-                          size="sm"
-                          className="me-1"
-                          onClick={() => {
-                            setSelectedAppointment(appointment);
-                            setShowNewAppointmentModal(true);
-                          }}
-                        >
-                          <FaEdit />
-                        </Button>
-                        {appointment.status === 'pending' && (
-                          <Button
-                            variant="outline-success"
-                            size="sm"
-                            className="me-1"
-                            onClick={() => handleConfirmAppointment(appointment.id)}
-                          >
-                            <FaCheck />
-                          </Button>
-                        )}
-                        {appointment.status !== 'canceled' && (
-                          <Button
-                            variant="outline-danger"
-                            size="sm"
-                            className="me-1"
-                            onClick={() => handleCancelAppointment(appointment.id)}
-                          >
-                            <FaTimes />
-                          </Button>
-                        )}
-                        {appointment.status !== 'canceled' && (
-                          <Button
-                            variant="outline-success"
-                            size="sm"
-                            onClick={() => handleSendReminder(appointment)}
-                          >
-                            <FaWhatsapp />
-                          </Button>
-                        )}
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </Table>
-          )}
-        </Card.Body>
-      </Card>
-
-      {/* Modal de Nueva Cita */}
-      <Modal show={showNewAppointmentModal} onHide={() => setShowNewAppointmentModal(false)} size="lg">
-        <Modal.Header closeButton className="bg-primary text-white">
+      {/* Modal para Nueva/Editar Cita */}
+      <Modal 
+        show={showNewAppointmentModal || showEditAppointmentModal} 
+        onHide={() => {
+          setShowNewAppointmentModal(false);
+          setShowEditAppointmentModal(false);
+        }}
+        centered
+        className="appointment-modal"
+      >
+        <Modal.Header closeButton>
           <Modal.Title>
-            <FaCalendarPlus className="me-2" />
             {selectedAppointment ? 'Editar Cita' : 'Nueva Cita'}
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form onSubmit={handleSubmit}>
-            <Row>
-              <Col md={6}>
-                <Form.Group className="mb-3">
-                  <Form.Label>Cliente</Form.Label>
-                  <Form.Select name="customerId" onChange={handleFormChange}>
-                    <option value="">Seleccionar cliente...</option>
-                    <option value="1">María González (CC 123456789)</option>
-                    <option value="2">Carlos Ramírez (CC 456789123)</option>
-                    <option value="new">+ Registrar nuevo cliente</option>
-                  </Form.Select>
-                </Form.Group>
-              </Col>
-              <Col md={6}>
-                <Form.Group className="mb-3">
-                  <Form.Label>Servicio</Form.Label>
-                  <Form.Select name="serviceId" onChange={handleFormChange}>
-                    <option value="">Seleccionar servicio...</option>
-                    <option value="1">Tratamiento Facial Premium ($180,000)</option>
-                    <option value="2">Depilación Láser ($250,000)</option>
-                    <option value="3">Masaje Relajante ($120,000)</option>
-                  </Form.Select>
-                </Form.Group>
-              </Col>
-            </Row>
+            <Form.Group className="mb-3">
+              <Form.Label>Nombre del Cliente</Form.Label>
+              <Form.Control
+                type="text"
+                name="clientName"
+                value={formData.clientName}
+                onChange={handleFormChange}
+                required
+                placeholder="Ingrese el nombre del cliente"
+              />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Servicio</Form.Label>
+              <Form.Select
+                name="service"
+                value={formData.service}
+                onChange={handleFormChange}
+                required
+              >
+                <option value="">Seleccionar servicio</option>
+                <option value="Corte y Color">Corte y Color</option>
+                <option value="Manicure">Manicure</option>
+                <option value="Pedicure">Pedicure</option>
+                <option value="Masaje">Masaje</option>
+              </Form.Select>
+            </Form.Group>
             <Row>
               <Col md={6}>
                 <Form.Group className="mb-3">
@@ -328,7 +398,9 @@ Gracias por confiar en MAOR Centro de Belleza.`;
                   <Form.Control
                     type="date"
                     name="date"
+                    value={formData.date}
                     onChange={handleFormChange}
+                    required
                   />
                 </Form.Group>
               </Col>
@@ -338,34 +410,36 @@ Gracias por confiar en MAOR Centro de Belleza.`;
                   <Form.Control
                     type="time"
                     name="time"
+                    value={formData.time}
                     onChange={handleFormChange}
+                    required
                   />
                 </Form.Group>
               </Col>
             </Row>
             <Form.Group className="mb-3">
-              <Form.Label>Profesional</Form.Label>
-              <Form.Select name="professionalId" onChange={handleFormChange}>
-                <option value="">Seleccionar profesional...</option>
-                <option value="1">Dra. Laura Martínez</option>
-                <option value="2">Est. Sofía Rodríguez</option>
-                <option value="3">Lic. Carolina Gómez</option>
-              </Form.Select>
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>Notas</Form.Label>
+              <Form.Label>Teléfono</Form.Label>
               <Form.Control
-                as="textarea"
-                rows={3}
-                name="notes"
+                type="tel"
+                name="phone"
+                value={formData.phone}
                 onChange={handleFormChange}
+                required
+                placeholder="Ingrese el número de teléfono"
               />
             </Form.Group>
             <div className="d-flex justify-content-end">
-              <Button variant="secondary" className="me-2" onClick={() => setShowNewAppointmentModal(false)}>
+              <Button 
+                variant="secondary" 
+                className="me-2"
+                onClick={() => {
+                  setShowNewAppointmentModal(false);
+                  setShowEditAppointmentModal(false);
+                }}
+              >
                 Cancelar
               </Button>
-              <Button variant="primary" type="submit">
+              <Button variant="primary" type="submit" className="btn-correjir">
                 {selectedAppointment ? 'Actualizar' : 'Guardar'} Cita
               </Button>
             </div>
@@ -373,43 +447,39 @@ Gracias por confiar en MAOR Centro de Belleza.`;
         </Modal.Body>
       </Modal>
 
-      {/* Modal de Recordatorio WhatsApp */}
-      <Modal show={showReminderModal} onHide={() => setShowReminderModal(false)}>
-        <Modal.Header closeButton className="bg-primary text-white">
-          <Modal.Title>
-            <FaWhatsapp className="me-2" />
-            Enviar Recordatorio
-          </Modal.Title>
+      {/* Modal de Confirmación de Eliminación */}
+      <Modal
+        show={showDeleteModal}
+        onHide={() => setShowDeleteModal(false)}
+        centered
+        className="delete-modal"
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Confirmar Eliminación</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <p>¿Está seguro que desea enviar un recordatorio por WhatsApp al cliente?</p>
-          <div className="alert alert-info">
-            <FaWhatsapp className="me-2" />
-            Se abrirá WhatsApp con el mensaje preparado.
+          <div className="text-center">
+            <FaTrash className="mb-3" style={{ fontSize: '2rem', color: '#e74c3c' }} />
+            <p>¿Está seguro que desea eliminar esta cita?</p>
+            <p className="text-muted">Esta acción no se puede deshacer.</p>
           </div>
-          <Form.Group className="mb-3">
-            <Form.Check
-              type="checkbox"
-              label="Incluir detalles de la cita"
-              defaultChecked
-            />
-          </Form.Group>
-          <Form.Group>
-            <Form.Label>Mensaje personalizado (opcional)</Form.Label>
-            <Form.Control as="textarea" rows={3} />
-          </Form.Group>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowReminderModal(false)}>
+          <Button 
+            variant="secondary" 
+            onClick={() => setShowDeleteModal(false)}
+          >
             Cancelar
           </Button>
-          <Button variant="success" onClick={handleConfirmSendReminder}>
-            <FaWhatsapp className="me-2" />
-            Enviar
+          <Button 
+            variant="danger" 
+            onClick={handleDelete}
+          >
+            Eliminar
           </Button>
         </Modal.Footer>
       </Modal>
-    </Container>
+    </CashierLayout>
   );
 };
 
