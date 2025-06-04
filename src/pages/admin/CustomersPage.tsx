@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Table, Button, Form, Row, Col, Card, Spinner } from 'react-bootstrap';
-import { FaEdit, FaTrash, FaUserPlus, FaSearch, FaWhatsapp, FaEye, FaDownload } from 'react-icons/fa';
+import { Container, Table, Button, Form, Row, Col, Card, Spinner, Modal } from 'react-bootstrap';
+import { FaEdit, FaTrash, FaUserPlus, FaSearch, FaWhatsapp, FaEye, FaDownload, FaUsers } from 'react-icons/fa';
 import BasePage from '../../components/admin/base/BasePage';
 import customerService, { Customer, CreateCustomerDto, UpdateCustomerDto } from '../../services/customerService';
 import { toast } from 'react-toastify';
 import CustomerModal from '../../components/admin/customers/CustomerModal';
+import CustomerForm from '../../components/customers/CustomerForm';
 
 const CustomersPage: React.FC = () => {
   const [customers, setCustomers] = useState<Customer[]>([]);
@@ -13,6 +14,7 @@ const CustomersPage: React.FC = () => {
   const [customerType, setCustomerType] = useState('all');
   const [showModal, setShowModal] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | undefined>();
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     fetchCustomers();
@@ -82,6 +84,24 @@ const CustomersPage: React.FC = () => {
 
   const handleWhatsApp = (phone: string) => {
     window.open(`https://wa.me/${phone.replace(/\D/g, '')}`, '_blank');
+  };
+
+  const handleAddCustomer = async (customerData: any) => {
+    try {
+      setIsLoading(true);
+      // Aquí iría la lógica para guardar el cliente en la base de datos
+      console.log('Datos del cliente a guardar:', customerData);
+      
+      // Simular delay de guardado
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      setShowModal(false);
+      // Aquí iría la lógica para actualizar la lista de clientes
+    } catch (error) {
+      console.error('Error al guardar el cliente:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const filteredCustomers = customers.filter(customer => {
@@ -188,13 +208,21 @@ const CustomersPage: React.FC = () => {
         </Card.Body>
       </Card>
 
-      <CustomerModal
-        show={showModal}
+      <Modal 
+        show={showModal} 
         onHide={handleCloseModal}
-        onSave={selectedCustomer ? handleUpdateCustomer : handleCreateCustomer}
-        customer={selectedCustomer}
-        title={selectedCustomer ? 'Editar Cliente' : 'Nuevo Cliente'}
-      />
+        size="lg"
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Nuevo Cliente</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <CustomerForm 
+            onSubmit={handleAddCustomer}
+            isLoading={isLoading}
+          />
+        </Modal.Body>
+      </Modal>
     </Container>
   );
 };

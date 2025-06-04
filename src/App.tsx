@@ -26,6 +26,7 @@ import EmployeeLocalClientsPage from './pages/employee/LocalClientsPage';
 import ClientsPage from './pages/cashier/ClientsPage';
 import InvoicePage from './pages/cashier/InvoicePage';
 import EmployeeInvoicePage from './pages/employee/InvoicePage';
+import PaymentMethodsPage from './pages/admin/PaymentMethodsPage';
 
 // Styles
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -33,6 +34,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import './assets/styles/global.css';
 import './assets/styles/menu.css';
 import './assets/styles/localClients.css';
+import './assets/styles/theme.css';
 
 const ROLES = {
   ADMIN: 'admin',
@@ -107,6 +109,7 @@ const App: React.FC = () => {
                   <Route path="sales" element={<SalesPage />} />
                   <Route path="services" element={<ServicesPage />} />
                   <Route path="products" element={<ProductsPage />} />
+                  <Route path="payment-methods" element={<PaymentMethodsPage />} />
                   <Route path="pqrf" element={<PQRFPage />} />
                   <Route path="reports" element={<ReportsPage />} />
                   <Route path="appointments" element={<AppointmentsPage />} />

@@ -13,7 +13,8 @@ import {
   FaExclamationCircle,
   FaBars,
   FaTimes,
-  FaSignOutAlt
+  FaSignOutAlt,
+  FaCreditCard
 } from 'react-icons/fa';
 import '../../../assets/styles/variables.css';
 import '../../../assets/styles/admin/admin-layout.css';
@@ -39,11 +40,6 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
       icon: <FaUsers />
     },
     { 
-      path: '/admin/sales', 
-      name: 'Gestión de Ventas', 
-      icon: <FaFileInvoiceDollar />
-    },
-    { 
       path: '/admin/services', 
       name: 'Gestión de Servicios', 
       icon: <FaConciergeBell />
@@ -54,24 +50,15 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
       icon: <FaBoxOpen />
     },
     { 
-      path: '/admin/pqrf', 
-      name: 'PQRF', 
-      icon: <FaExclamationCircle />
-    },
-    { 
-      path: '/admin/reports', 
-      name: 'Reportes', 
-      icon: <FaChartBar />
-    },
-    { 
-      path: '/admin/appointments', 
-      name: 'Gestión de Citas', 
-      icon: <FaCalendarAlt />
-    },
-    { 
       path: '/admin/employees', 
       name: 'Gestión de Empleados', 
       icon: <FaUserTie />
+    },
+    { 
+      path: '/admin/payment-methods', 
+      name: 'Gestión de Métodos de Pago', 
+      icon: <FaCreditCard />,
+      highlight: true
     }
   ];
 
@@ -90,19 +77,17 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
       </button>
 
       <aside className={`sidebar ${isMenuOpen ? 'show' : ''}`}>
-        <div className="brand-container">
+        <div className="sidebar-header">
           <h2><FaSpa className="me-2" />MAOR</h2>
-          <p>Centro de Belleza - Sincelejo</p>
         </div>
 
         <nav className="menu-section">
-          <h5 className="menu-section-title">MENÚ ADMINISTRADOR</h5>
           <div className="nav-menu">
             {menuItems.map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
-                className={`sidebar-item ${location.pathname === item.path ? 'active' : ''}`}
+                className={`sidebar-item ${location.pathname === item.path ? 'active' : ''} ${item.highlight ? 'highlight' : ''}`}
                 onClick={() => setIsMenuOpen(false)}
               >
                 {item.icon}
@@ -113,16 +98,8 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
         </nav>
 
         <div className="user-info">
-          <div className="user-info-content">
-            <div className="user-avatar">
-              <span>A</span>
-            </div>
-            <div className="user-details">
-              <p className="user-name">Usuario Administrador</p>
-            </div>
-          </div>
           <button 
-            className="logout-button"
+            className="btn-maor logout-button"
             onClick={handleLogout}
           >
             <FaSignOutAlt />
@@ -134,6 +111,18 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
       <main className="admin-content">
         {children}
       </main>
+
+      <style>
+        {`
+          .sidebar-item.highlight {
+            border-left: 3px solid var(--maor-primary);
+          }
+          .sidebar-item.active {
+            background-color: var(--maor-primary);
+            color: white;
+          }
+        `}
+      </style>
     </div>
   );
 };
