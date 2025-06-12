@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Table, Button, Form, Row, Col, Card, Spinner, Modal } from 'react-bootstrap';
-import { FaUserTie, FaEdit, FaTrash, FaSearch, FaPlus } from 'react-icons/fa';
+import { Container, Table, Button, Form, Row, Col, Card, Spinner, Modal, Badge } from 'react-bootstrap';
+import { FaUserTie, FaEdit, FaTrash, FaSearch, FaPlus, FaUsers } from 'react-icons/fa';
 import EmployeeForm from '../../components/employees/EmployeeForm';
 import { toast } from 'react-toastify';
 
@@ -38,15 +38,24 @@ const EmployeesPage: React.FC = () => {
       setEmployees([
         {
           id: 1,
-          name: 'Juan Pérez',
-          email: 'juan@maor.com',
-          phone: '3001234567',
+          name: 'Ana García',
+          email: 'ana@maor.com',
+          phone: '300-123-4567',
           identification_number: '123456789',
           hire_date: '2023-01-15',
           is_active: true,
-          role: 'admin'
+          role: 'Estilista'
         },
-        // Más empleados de ejemplo...
+        {
+          id: 2,
+          name: 'Carlos Pérez',
+          email: 'carlos@maor.com',
+          phone: '300-765-4321',
+          identification_number: '987654321',
+          hire_date: '2023-02-20',
+          is_active: false,
+          role: 'Barbero'
+        }
       ]);
     } catch (error) {
       console.error('Error fetching employees:', error);
@@ -102,116 +111,109 @@ const EmployeesPage: React.FC = () => {
   });
 
   return (
-    <Container fluid>
-      <Row className="mb-4">
-        <Col>
-          <Card className="admin-panel">
-            <Card.Body>
-              <div className="d-flex justify-content-between align-items-center mb-4">
-                <h2 className="mb-0">
-                  <FaUserTie className="me-2" />
-                  Gestión de Empleados
-                </h2>
-                <Button 
-                  className="btn-maor"
-                  onClick={() => setShowModal(true)}
+    <Container fluid className="py-4">
+      <div className="d-flex align-items-center mb-4">
+        <div className="me-3">
+          <div className="bg-primary bg-opacity-10 p-3 rounded-circle" style={{ color: 'var(--maor-primary)' }}>
+            <FaUserTie size={24} />
+          </div>
+        </div>
+        <div>
+          <h4 className="mb-0">Gestión de Empleados</h4>
+          <p className="text-muted mb-0">Administra el personal del centro de belleza</p>
+        </div>
+      </div>
+
+      <Card className="shadow-sm">
+        <Card.Header className="bg-white py-3">
+          <div className="d-flex justify-content-between align-items-center">
+            <div className="d-flex align-items-center">
+              <FaUsers className="me-2" style={{ color: 'var(--maor-primary)' }} />
+              <span>Lista de Empleados</span>
+            </div>
+            <Button 
+              variant="primary" 
+              style={{ backgroundColor: 'var(--maor-primary)', borderColor: 'var(--maor-primary)' }}
+              onClick={() => setShowModal(true)}
+            >
+              <FaPlus className="me-2" />
+              Nuevo Empleado
+            </Button>
+          </div>
+        </Card.Header>
+        <Card.Body>
+          <Row className="mb-4">
+            <Col md={4}>
+              <Form.Group>
+                <Form.Control
+                  type="text"
+                  placeholder="Buscar empleados..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </Form.Group>
+            </Col>
+            <Col md={3}>
+              <Form.Group>
+                <Form.Select
+                  value={roleFilter}
+                  onChange={(e) => setRoleFilter(e.target.value)}
                 >
-                  <FaPlus className="me-2" />
-                  Nuevo Empleado
-                </Button>
-              </div>
+                  <option value="all">Todos los roles</option>
+                  <option value="Estilista">Estilista</option>
+                  <option value="Barbero">Barbero</option>
+                </Form.Select>
+              </Form.Group>
+            </Col>
+          </Row>
 
-              <Row className="mb-4">
-                <Col md={4}>
-                  <Form.Group>
-                    <Form.Control
-                      type="text"
-                      placeholder="Buscar empleados..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                  </Form.Group>
-                </Col>
-                <Col md={3}>
-                  <Form.Group>
-                    <Form.Select
-                      value={roleFilter}
-                      onChange={(e) => setRoleFilter(e.target.value)}
-                    >
-                      <option value="all">Todos los roles</option>
-                      <option value="admin">Administrador</option>
-                      <option value="cashier">Cajero</option>
-                      <option value="employee">Empleado</option>
-                    </Form.Select>
-                  </Form.Group>
-                </Col>
-              </Row>
-
-              {loading ? (
-                <div className="text-center p-5">
-                  <Spinner animation="border" role="status">
-                    <span className="visually-hidden">Cargando...</span>
-                  </Spinner>
-                </div>
-              ) : (
-                <Table responsive hover>
-                  <thead>
-                    <tr>
-                      <th>ID</th>
-                      <th>Nombre</th>
-                      <th>Email</th>
-                      <th>Teléfono</th>
-                      <th>Identificación</th>
-                      <th>Rol</th>
-                      <th>Estado</th>
-                      <th>Acciones</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredEmployees.map(employee => (
-                      <tr key={employee.id}>
-                        <td>{employee.id}</td>
-                        <td>{employee.name}</td>
-                        <td>{employee.email}</td>
-                        <td>{employee.phone}</td>
-                        <td>{employee.identification_number}</td>
-                        <td>
-                          <span className={`badge bg-${employee.role === 'admin' ? 'danger' : employee.role === 'cashier' ? 'warning' : 'info'}`}>
-                            {employee.role === 'admin' ? 'Administrador' : 
-                             employee.role === 'cashier' ? 'Cajero' : 'Empleado'}
-                          </span>
-                        </td>
-                        <td>
-                          <span className={`badge ${employee.is_active ? 'bg-success' : 'bg-danger'}`}>
-                            {employee.is_active ? 'Activo' : 'Inactivo'}
-                          </span>
-                        </td>
-                        <td>
-                          <Button 
-                            variant="outline-primary" 
-                            size="sm" 
-                            className="me-2"
-                            onClick={() => console.log('Editar', employee.id)}
-                          >
-                            <FaEdit />
-                          </Button>
-                          <Button 
-                            variant="outline-danger" 
-                            size="sm"
-                            onClick={() => handleDeleteEmployee(employee.id)}
-                          >
-                            <FaTrash />
-                          </Button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </Table>
-              )}
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
+          {loading ? (
+            <div className="text-center p-5">
+              <Spinner animation="border" role="status">
+                <span className="visually-hidden">Cargando...</span>
+              </Spinner>
+            </div>
+          ) : (
+            <Table responsive hover className="align-middle">
+              <thead>
+                <tr>
+                  <th>Nombre</th>
+                  <th>Rol</th>
+                  <th>Email</th>
+                  <th>Teléfono</th>
+                  <th className="text-center">Estado</th>
+                  <th className="text-center">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredEmployees.map(employee => (
+                  <tr key={employee.id}>
+                    <td>{employee.name}</td>
+                    <td>{employee.role}</td>
+                    <td>{employee.email}</td>
+                    <td>{employee.phone}</td>
+                    <td className="text-center">
+                      <Badge bg={employee.is_active ? 'success' : 'danger'}>
+                        {employee.is_active ? 'Activo' : 'Inactivo'}
+                      </Badge>
+                    </td>
+                    <td>
+                      <div className="d-flex justify-content-center gap-2">
+                        <Button variant="outline-primary" size="sm" onClick={() => console.log('Editar', employee.id)}>
+                          <FaEdit />
+                        </Button>
+                        <Button variant="outline-danger" size="sm" onClick={() => handleDeleteEmployee(employee.id)}>
+                          <FaTrash />
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          )}
+        </Card.Body>
+      </Card>
 
       <Modal 
         show={showModal} 

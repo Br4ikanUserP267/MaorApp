@@ -48,11 +48,6 @@ const CashierLayout: React.FC<CashierLayoutProps> = ({ children }) => {
       path: '/cashier/sales', 
       name: 'Gestión de Ventas', 
       icon: <FaFileInvoiceDollar />
-    },
-    { 
-      path: '/cashier/invoices', 
-      name: 'Facturas', 
-      icon: <FaFileAlt />
     }
   ];
 

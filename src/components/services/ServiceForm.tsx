@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Form, Button, Row, Col } from 'react-bootstrap';
+import { Form, Button, Row, Col, Alert } from 'react-bootstrap';
 import Select from 'react-select';
-import { FaCut } from 'react-icons/fa';
+import { FaCut, FaTags } from 'react-icons/fa';
 
 interface ServiceFormProps {
   onSubmit: (serviceData: any) => void;
@@ -22,8 +22,11 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
     duration_minutes: '',
     is_taxable: true,
     tax_rate: '0',
-    category_id: null
+    category_id: null,
+    notes: ''
   });
+
+  const [errors, setErrors] = useState<{[key: string]: string}>({});
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
@@ -31,6 +34,14 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
       ...prev,
       [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
     }));
+    // Limpiar error cuando el usuario modifica el campo
+    if (errors[name]) {
+      setErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[name];
+        return newErrors;
+      });
+    }
   };
 
   const handleCategoryChange = (option: any) => {
@@ -38,10 +49,42 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
       ...prev,
       category_id: option
     }));
+    if (errors.category_id) {
+      setErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors.category_id;
+        return newErrors;
+      });
+    }
+  };
+
+  const validateForm = () => {
+    const newErrors: {[key: string]: string} = {};
+
+    if (!formData.name.trim()) {
+      newErrors.name = 'El nombre del servicio es requerido';
+    }
+    if (!formData.category_id) {
+      newErrors.category_id = 'La categoría es requerida';
+    }
+    if (!formData.duration_minutes) {
+      newErrors.duration_minutes = 'La duración es requerida';
+    }
+    if (!formData.price) {
+      newErrors.price = 'El precio es requerido';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!validateForm()) {
+      return;
+    }
+
     onSubmit({
       ...formData,
       price: parseFloat(formData.price),
@@ -52,10 +95,21 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
 
   return (
     <Form onSubmit={handleSubmit} className="p-4 bg-white rounded shadow-sm">
-      <h3 className="mb-4 text-primary">
+      <h3 className="mb-4 text-primary d-flex align-items-center">
         <FaCut className="me-2" />
         Registrar Nuevo Servicio
       </h3>
+
+      {Object.keys(errors).length > 0 && (
+        <Alert variant="danger">
+          Por favor, corrija los siguientes errores:
+          <ul className="mb-0">
+            {Object.values(errors).map((error, index) => (
+              <li key={index}>{error}</li>
+            ))}
+          </ul>
+        </Alert>
+      )}
 
       <Row className="g-3">
         <Col md={6}>
@@ -68,7 +122,11 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
               onChange={handleChange}
               required
               placeholder="Ingrese el nombre del servicio"
+              isInvalid={!!errors.name}
             />
+            <Form.Control.Feedback type="invalid">
+              {errors.name}
+            </Form.Control.Feedback>
           </Form.Group>
         </Col>
 
@@ -82,6 +140,28 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
               onChange={handleChange}
               placeholder="Código único del servicio"
             />
+          </Form.Group>
+        </Col>
+
+        <Col md={12}>
+          <Form.Group className="mb-3">
+            <Form.Label className="d-flex align-items-center">
+              <FaTags className="me-2" />
+              Categoría *
+            </Form.Label>
+            <Select
+              options={categories}
+              value={formData.category_id}
+              onChange={handleCategoryChange}
+              placeholder="Seleccione una categoría"
+              isClearable
+              className={errors.category_id ? 'is-invalid' : ''}
+            />
+            {errors.category_id && (
+              <div className="invalid-feedback d-block">
+                {errors.category_id}
+              </div>
+            )}
           </Form.Group>
         </Col>
 
@@ -101,19 +181,6 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
 
         <Col md={6}>
           <Form.Group className="mb-3">
-            <Form.Label>Categoría</Form.Label>
-            <Select
-              options={categories}
-              value={formData.category_id}
-              onChange={handleCategoryChange}
-              placeholder="Seleccione una categoría"
-              isClearable
-            />
-          </Form.Group>
-        </Col>
-
-        <Col md={6}>
-          <Form.Group className="mb-3">
             <Form.Label>Duración (minutos) *</Form.Label>
             <Form.Control
               type="number"
@@ -123,11 +190,15 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
               required
               min="1"
               placeholder="Duración en minutos"
+              isInvalid={!!errors.duration_minutes}
             />
+            <Form.Control.Feedback type="invalid">
+              {errors.duration_minutes}
+            </Form.Control.Feedback>
           </Form.Group>
         </Col>
 
-        <Col md={4}>
+        <Col md={6}>
           <Form.Group className="mb-3">
             <Form.Label>Precio *</Form.Label>
             <Form.Control
@@ -139,11 +210,29 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
               min="0"
               step="0.01"
               placeholder="0.00"
+              isInvalid={!!errors.price}
+            />
+            <Form.Control.Feedback type="invalid">
+              {errors.price}
+            </Form.Control.Feedback>
+          </Form.Group>
+        </Col>
+
+        <Col md={12}>
+          <Form.Group className="mb-3">
+            <Form.Label>Notas del Servicio</Form.Label>
+            <Form.Control
+              as="textarea"
+              name="notes"
+              value={formData.notes}
+              onChange={handleChange}
+              rows={2}
+              placeholder="Notas adicionales sobre el servicio"
             />
           </Form.Group>
         </Col>
 
-        <Col md={4}>
+        <Col md={6}>
           <Form.Group className="mb-3">
             <Form.Check
               type="checkbox"
@@ -152,12 +241,12 @@ const ServiceForm: React.FC<ServiceFormProps> = ({
               label="Aplica Impuesto"
               checked={formData.is_taxable}
               onChange={handleChange}
-              className="mt-4"
+              className="mt-2"
             />
           </Form.Group>
         </Col>
 
-        <Col md={4}>
+        <Col md={6}>
           <Form.Group className="mb-3">
             <Form.Label>Tasa de Impuesto (%)</Form.Label>
             <Form.Control

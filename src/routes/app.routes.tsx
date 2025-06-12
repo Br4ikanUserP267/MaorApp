@@ -5,6 +5,7 @@ import ClientsPage from '../pages/cashier/ClientsPage';
 import LocalClientsPage from '../pages/cashier/LocalClientsPage';
 import AdminDashboard from '../pages/admin/AdminDashboard';
 import EmployeeDashboard from '../pages/employee/EmployeeDashboard';
+import AppointmentsCalendar from '../pages/employee/AppointmentsCalendar';
 import LoginPage from '../pages/auth/LoginPage';
 import ProtectedRoute from '../components/auth/ProtectedRoute';
 
@@ -30,6 +31,7 @@ const AppRoutes = () => {
       {/* Employee Routes */}
       <Route path="/employee" element={<ProtectedRoute role="employee" />}>
         <Route index element={<EmployeeDashboard />} />
+        <Route path="appointments" element={<AppointmentsCalendar />} />
       </Route>
 
       {/* Catch all - redirect to login */}

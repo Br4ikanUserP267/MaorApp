@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Button, Table, Badge, Modal, Form, Alert } from 'react-bootstrap';
-import { FaPlus, FaEdit, FaTrash } from 'react-icons/fa';
+import { FaPlus, FaEdit, FaTrash, FaCreditCard, FaMoneyBillWave } from 'react-icons/fa';
 
 interface PaymentMethod {
   id: number;
@@ -128,10 +128,25 @@ const PaymentMethodsPage: React.FC = () => {
         </Alert>
       )}
       
+      <div className="d-flex align-items-center mb-4">
+        <div className="me-3">
+          <div className="bg-primary bg-opacity-10 p-3 rounded-circle" style={{ color: 'var(--maor-primary)' }}>
+            <FaCreditCard size={24} />
+          </div>
+        </div>
+        <div>
+          <h4 className="mb-0">Gestión de Métodos de Pago</h4>
+          <p className="text-muted mb-0">Administra las formas de pago disponibles</p>
+        </div>
+      </div>
+      
       <Card className="shadow-sm">
         <Card.Header className="bg-white py-3">
           <div className="d-flex justify-content-between align-items-center">
-            <h5 className="mb-0">Gestión de Métodos de Pago</h5>
+            <div className="d-flex align-items-center">
+              <FaMoneyBillWave className="me-2" style={{ color: 'var(--maor-primary)' }} />
+              <span>Lista de Métodos de Pago</span>
+            </div>
             <Button 
               variant="primary" 
               onClick={handleShowModal}

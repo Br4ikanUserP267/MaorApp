@@ -10,6 +10,8 @@ interface Service {
   name: string;
   price: number;
   duration: number;
+  category: string;
+  description?: string;
 }
 
 interface Professional {
@@ -31,14 +33,70 @@ const products: Product[] = [
 ];
 
 const services: Service[] = [
-  { id: 1, name: 'Tratamiento Facial Premium', price: 180000, duration: 90 },
-  { id: 2, name: 'Depilación Láser', price: 250000, duration: 45 },
-  { id: 3, name: 'Masaje Relajante', price: 120000, duration: 60 },
-  { id: 4, name: 'Manicura Semipermanente', price: 80000, duration: 45 },
-  { id: 5, name: 'Pedicura Spa', price: 90000, duration: 60 },
-  { id: 6, name: 'Limpieza Facial Profunda', price: 150000, duration: 75 },
-  { id: 7, name: 'Maquillaje Profesional', price: 130000, duration: 60 },
-  { id: 8, name: 'Tratamiento Capilar', price: 160000, duration: 90 }
+  { 
+    id: 1, 
+    name: 'Tratamiento Facial Premium', 
+    price: 180000, 
+    duration: 90, 
+    category: 'Facial',
+    description: 'Tratamiento facial completo con productos premium'
+  },
+  { 
+    id: 2, 
+    name: 'Depilación Láser', 
+    price: 250000, 
+    duration: 45, 
+    category: 'Depilación',
+    description: 'Depilación láser con tecnología de última generación'
+  },
+  { 
+    id: 3, 
+    name: 'Masaje Relajante', 
+    price: 120000, 
+    duration: 60, 
+    category: 'Corporal',
+    description: 'Masaje corporal completo con aceites esenciales'
+  },
+  { 
+    id: 4, 
+    name: 'Manicura Semipermanente', 
+    price: 80000, 
+    duration: 45, 
+    category: 'Uñas',
+    description: 'Manicura con esmalte semipermanente y tratamiento de cutículas'
+  },
+  { 
+    id: 5, 
+    name: 'Pedicura Spa', 
+    price: 90000, 
+    duration: 60, 
+    category: 'Uñas',
+    description: 'Pedicura completa con tratamiento exfoliante y masaje'
+  },
+  { 
+    id: 6, 
+    name: 'Limpieza Facial Profunda', 
+    price: 150000, 
+    duration: 75, 
+    category: 'Facial',
+    description: 'Limpieza facial profunda con extracción y mascarilla'
+  },
+  { 
+    id: 7, 
+    name: 'Maquillaje Profesional', 
+    price: 130000, 
+    duration: 60, 
+    category: 'Maquillaje',
+    description: 'Maquillaje profesional para eventos especiales'
+  },
+  { 
+    id: 8, 
+    name: 'Tratamiento Capilar', 
+    price: 160000, 
+    duration: 90, 
+    category: 'Cabello',
+    description: 'Tratamiento capilar reconstructor con keratina'
+  }
 ];
 
 const professionals: Professional[] = [
@@ -85,6 +143,16 @@ const localClientService = {
       acc[product.category].push(product);
       return acc;
     }, {} as Record<string, Product[]>);
+  },
+
+  getServicesByCategory(): Record<string, Service[]> {
+    return services.reduce((acc, service) => {
+      if (!acc[service.category]) {
+        acc[service.category] = [];
+      }
+      acc[service.category].push(service);
+      return acc;
+    }, {} as Record<string, Service[]>);
   }
 };
 

@@ -4,10 +4,10 @@ import {
   FaSpa, 
   FaTachometerAlt, 
   FaStore,
-  FaFileAlt,
   FaBars,
   FaTimes,
-  FaSignOutAlt
+  FaSignOutAlt,
+  FaCalendarAlt
 } from 'react-icons/fa';
 import '../../../assets/styles/employee/employee-layout.css';
 
@@ -32,9 +32,9 @@ const EmployeeLayout: React.FC<EmployeeLayoutProps> = ({ children }) => {
       icon: <FaStore />
     },
     { 
-      path: '/employee/invoices', 
-      name: 'Facturas', 
-      icon: <FaFileAlt />
+      path: '/employee/appointments', 
+      name: 'Calendario de Servicios', 
+      icon: <FaCalendarAlt />
     }
   ];
 

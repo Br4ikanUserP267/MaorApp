@@ -16,6 +16,8 @@ interface LocalClient {
     professional: string;
     duration: number;
     progress?: number;
+    category: string;
+    description: string;
   };
   products: Array<{
     name: string;
@@ -33,6 +35,8 @@ const EmployeeLocalClientsPage: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [services, setServices] = useState<Service[]>([]);
   const [productsByCategory, setProductsByCategory] = useState<Record<string, Product[]>>({});
+  const [servicesByCategory, setServicesByCategory] = useState<Record<string, Service[]>>({});
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
   // Form states
   const [selectedProduct, setSelectedProduct] = useState<string>('');
@@ -74,7 +78,9 @@ const EmployeeLocalClientsPage: React.FC = () => {
               price: 180000,
               professional: "Dra. Laura Martínez",
               duration: 45,
-              progress: 65
+              progress: 65,
+              category: "Facial",
+              description: "Tratamiento facial avanzado para mejorar la piel"
             },
             products: []
           },
@@ -87,7 +93,9 @@ const EmployeeLocalClientsPage: React.FC = () => {
               name: "Depilación Láser",
               price: 250000,
               professional: "Dra. Laura Martínez",
-              duration: 30
+              duration: 30,
+              category: "Depilación",
+              description: "Eliminación definitiva de pelo mediante láser"
             },
             products: []
           }
@@ -99,6 +107,7 @@ const EmployeeLocalClientsPage: React.FC = () => {
         setProducts(productsData);
         setServices(servicesData);
         setProductsByCategory(localClientService.getProductsByCategory());
+        setServicesByCategory(localClientService.getServicesByCategory());
       } catch (error) {
         console.error('Error loading data:', error);
         toast.error('Error al cargar los datos');
@@ -178,7 +187,9 @@ const EmployeeLocalClientsPage: React.FC = () => {
                   price: service.price,
                   professional: currentEmployee.name,
                   duration: service.duration,
-                  progress: 0
+                  progress: 0,
+                  category: service.category,
+                  description: service.description
                 }
               };
             }
@@ -370,33 +381,57 @@ const EmployeeLocalClientsPage: React.FC = () => {
       </Modal>
 
       {/* Service Modal */}
-      <Modal show={showServiceModal} onHide={() => setShowServiceModal(false)}>
-        <Modal.Header closeButton className="bg-primary text-white">
+      <Modal show={showServiceModal} onHide={() => setShowServiceModal(false)} size="lg">
+        <Modal.Header closeButton>
           <Modal.Title>
-            <FaSpa className="me-2" />Añadir Servicio - {selectedClient?.name}
+            <FaSpa className="me-2" />
+            Añadir Servicio - {selectedClient?.name}
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form onSubmit={(e) => {
-            e.preventDefault();
-            if (selectedClient) {
-              handleAddService(selectedClient.id);
-            }
-          }}>
-            <Form.Group className="mb-3">
+          <Form>
+            <Form.Group className="mb-4">
               <Form.Label>Tipo de Servicio</Form.Label>
               <Form.Select
-                value={selectedService}
-                onChange={(e) => setSelectedService(e.target.value)}
-                required
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                className="mb-3"
               >
-                <option value="">Seleccionar servicio...</option>
-                {services.map(service => (
-                  <option key={service.id} value={service.id}>
-                    {service.name} (${service.price.toLocaleString()}) - {service.duration} min
+                <option value="all">Todas las categorías</option>
+                {Object.keys(servicesByCategory).map(category => (
+                  <option key={category} value={category}>
+                    {category}
                   </option>
                 ))}
               </Form.Select>
+
+              <div className="service-grid">
+                {(selectedCategory === 'all' ? services : servicesByCategory[selectedCategory] || [])
+                  .map(service => (
+                    <Card
+                      key={service.id}
+                      className={`service-card ${selectedService === service.id.toString() ? 'selected' : ''}`}
+                      onClick={() => setSelectedService(service.id.toString())}
+                    >
+                      <Card.Body>
+                        <div className="d-flex justify-content-between align-items-start mb-2">
+                          <h6 className="mb-0">{service.name}</h6>
+                          <Badge bg="primary" style={{ backgroundColor: 'var(--maor-primary)' }}>
+                            {service.category}
+                          </Badge>
+                        </div>
+                        <p className="text-muted small mb-2">{service.description}</p>
+                        <div className="d-flex justify-content-between align-items-center">
+                          <small>
+                            <FaClock className="me-1" />
+                            {service.duration} min
+                          </small>
+                          <strong>${service.price.toLocaleString()}</strong>
+                        </div>
+                      </Card.Body>
+                    </Card>
+                  ))}
+              </div>
             </Form.Group>
 
             <Form.Group className="mb-3">
@@ -406,20 +441,24 @@ const EmployeeLocalClientsPage: React.FC = () => {
                 rows={3}
                 value={serviceNotes}
                 onChange={(e) => setServiceNotes(e.target.value)}
-                placeholder="Observaciones o instrucciones especiales..."
+                placeholder="Notas adicionales sobre el servicio..."
               />
             </Form.Group>
-
-            <div className="d-flex justify-content-end">
-              <Button variant="secondary" className="me-2" onClick={() => setShowServiceModal(false)}>
-                Cancelar
-              </Button>
-              <Button variant="maor" type="submit">
-                <FaSpa className="me-2" />Añadir Servicio
-              </Button>
-            </div>
           </Form>
         </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowServiceModal(false)}>
+            Cancelar
+          </Button>
+          <Button
+            variant="primary"
+            onClick={() => selectedClient && handleAddService(selectedClient.id)}
+            disabled={!selectedService}
+            style={{ backgroundColor: 'var(--maor-primary)', borderColor: 'var(--maor-primary)' }}
+          >
+            Agregar Servicio
+          </Button>
+        </Modal.Footer>
       </Modal>
     </StaffLayout>
   );
@@ -528,5 +567,36 @@ const ClientCard: React.FC<ClientCardProps> = ({
     </Card>
   );
 };
+
+// Add these styles at the end of LocalClientsPage.css
+const styles = `
+.service-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.service-card {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid transparent;
+}
+
+.service-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.service-card.selected {
+  border-color: var(--maor-primary);
+  background-color: rgba(142, 68, 173, 0.05);
+}
+
+.service-card .badge {
+  font-size: 0.75rem;
+  font-weight: normal;
+}
+`;
 
 export default EmployeeLocalClientsPage; 

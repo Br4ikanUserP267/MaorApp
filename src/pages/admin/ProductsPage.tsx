@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Button, Modal } from 'react-bootstrap';
-import { FaPlus } from 'react-icons/fa';
+import { Container, Row, Col, Button, Modal, Card, Table, Badge } from 'react-bootstrap';
+import { FaBox, FaBoxes, FaPlus, FaEdit, FaTrash } from 'react-icons/fa';
 import ProductForm from '../../components/products/ProductForm';
 import ProductList from '../../components/products/ProductList';
 import CategoryForm from '../../components/products/CategoryForm';
@@ -15,6 +15,7 @@ interface Product {
     id: number;
     name: string;
   };
+  status: string;
 }
 
 interface Category {
@@ -133,37 +134,81 @@ const ProductsPage: React.FC = () => {
 
   return (
     <Container fluid className="py-4">
-      <Row className="mb-4">
-        <Col>
-          <h2 className="mb-4">Gestión de Productos</h2>
-          <div className="d-flex gap-2">
+      <div className="d-flex align-items-center mb-4">
+        <div className="me-3">
+          <div className="bg-primary bg-opacity-10 p-3 rounded-circle" style={{ color: 'var(--maor-primary)' }}>
+            <FaBox size={24} />
+          </div>
+        </div>
+        <div>
+          <h4 className="mb-0">Gestión de Productos</h4>
+          <p className="text-muted mb-0">Administra el inventario de productos</p>
+        </div>
+      </div>
+
+      <Card className="shadow-sm">
+        <Card.Header className="bg-white py-3">
+          <div className="d-flex justify-content-between align-items-center">
+            <div className="d-flex align-items-center">
+              <FaBoxes className="me-2" style={{ color: 'var(--maor-primary)' }} />
+              <span>Lista de Productos</span>
+            </div>
             <Button 
               variant="primary" 
+              style={{ backgroundColor: 'var(--maor-primary)', borderColor: 'var(--maor-primary)' }}
               onClick={() => setShowProductModal(true)}
             >
               <FaPlus className="me-2" />
               Nuevo Producto
             </Button>
-            <Button 
-              variant="outline-primary" 
-              onClick={() => setShowCategoryModal(true)}
-            >
-              <FaPlus className="me-2" />
-              Nueva Categoría
-            </Button>
           </div>
-        </Col>
-      </Row>
-
-      <Row>
-        <Col>
-          <ProductList 
-            products={products}
-            onEdit={handleEditProduct}
-            onDelete={handleDeleteProduct}
-          />
-        </Col>
-      </Row>
+        </Card.Header>
+        <Card.Body>
+          <Table responsive hover className="align-middle">
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Categoría</th>
+                <th className="text-end">Precio</th>
+                <th className="text-center">Stock</th>
+                <th className="text-center">Estado</th>
+                <th className="text-center">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {products.map(product => (
+                <tr key={product.id}>
+                  <td>{product.name}</td>
+                  <td>{product.category?.name}</td>
+                  <td className="text-end">
+                    ${product.price.toLocaleString()}
+                  </td>
+                  <td className="text-center">
+                    <Badge bg={product.stock > 10 ? 'success' : product.stock > 5 ? 'warning' : 'danger'}>
+                      {product.stock} unidades
+                    </Badge>
+                  </td>
+                  <td className="text-center">
+                    <Badge bg={product.status === 'active' ? 'success' : 'danger'}>
+                      {product.status === 'active' ? 'Activo' : 'Inactivo'}
+                    </Badge>
+                  </td>
+                  <td>
+                    <div className="d-flex justify-content-center gap-2">
+                      <Button variant="outline-primary" size="sm" onClick={() => handleEditProduct(product)}>
+                        <FaEdit />
+                      </Button>
+                      <Button variant="outline-danger" size="sm" onClick={() => handleDeleteProduct(product)}>
+                        <FaTrash />
+                      </Button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        </Card.Body>
+      </Card>
 
       {/* Modal for new product */}
       <Modal
